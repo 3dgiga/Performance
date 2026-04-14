@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Performance Auto Center</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+    :root{
+      --bgDark:#2d0f0f;
+      --bgPrimary:#4a1c1c;
+      --bgSecondary:#5c2020;
+      --bgLight:#6b2525;
+
+      --gold:#ffd700;
+      --goldLight:#ffb347;
+      --orange:#ff8c00;
+      --orangeRed:#ff4500;
+      --red:#dc143c;
+      --redDark:#8b0000;
+
+      --silver:#c0c0c0;
+      --silverLight:#e8e8e8;
+      --silverDark:#8a8a8a;
+      --steel:#b8b8b8;
+
+      --text:#ffffff;
+      --textMuted:#d4af37;
+    }
+
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+    }
+
+    html,body{
+      min-height:100%;
+    }
+
+    body{
+      font-family:'Montserrat',sans-serif;
+      min-height:100vh;
+      display:grid;
+      place-items:center;
+      padding:24px;
+      overflow:auto;
+      color:#fff;
+      background:
+        radial-gradient(circle at 50% 30%, rgba(255,140,0,.15), transparent 40%),
+        radial-gradient(circle at 70% 50%, rgba(220,20,60,.1), transparent 35%),
+        linear-gradient(180deg, var(--bgSecondary) 0%, var(--bgPrimary) 50%, var(--bgDark) 100%);
+      background-attachment:fixed;
+    }
+
+    .screen{
+      width:min(390px, 95vw);
+      height:min(860px, 92vh);
+      border-radius:44px;
+      overflow:hidden;
+      position:relative;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(255,215,0,.08), transparent 35%),
+        linear-gradient(180deg, var(--bgSecondary) 0%, var(--bgPrimary) 60%, var(--bgDark) 100%);
+      box-shadow:
+        0 30px 80px rgba(0,0,0,.8),
+        inset 0 0 0 1px rgba(255,255,255,.08),
+        inset 0 0 60px rgba(0,0,0,.5);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      padding:32px 20px 20px;
+    }
+
+    .screen::before{
+      content:"";
+      position:absolute;
+      top:0;
+      left:0;
+      right:0;
+      height:200px;
+      background:
+        radial-gradient(ellipse at 50% 0%, rgba(255,179,71,.15), transparent 50%);
+      pointer-events:none;
+    }
+
+    .screen::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        repeating-linear-gradient(
+          90deg,
+          rgba(255,255,255,.02) 0 1px,
+          transparent 1px 3px
+        );
+      pointer-events:none;
+      opacity:0.5;
+    }
+
+    .hero{
+      width:100%;
+      text-align:center;
+      position:relative;
+      z-index:1;
+      margin-bottom:24px;
+    }
+
+    .logo-container{
+      width:min(300px, 90%);
+      margin:0 auto 20px;
+      position:relative;
+    }
+
+    .logo{
+      width:100%;
+      height:auto;
+      display:block;
+      filter: 
+        drop-shadow(0 8px 20px rgba(0,0,0,.8))
+        drop-shadow(0 0 30px rgba(255,140,0,.2));
+      border-radius:16px;
+    }
+
+    .logo-text{
+      font-size:clamp(1.5rem, 4.5vw, 2rem);
+      font-weight:900;
+      letter-spacing:3px;
+      background:linear-gradient(180deg, #ffffff 0%, var(--silver) 50%, var(--silverDark) 100%);
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text;
+      text-shadow:
+        0 2px 8px rgba(0,0,0,.8),
+        0 0 20px rgba(255,215,0,.1);
+      margin-bottom:10px;
+      line-height:1.1;
+      text-transform:uppercase;
+    }
+
+    .tagline{
+      font-size:clamp(0.75rem, 2.2vw, 0.85rem);
+      font-weight:700;
+      line-height:1.4;
+      letter-spacing:2px;
+      background:linear-gradient(90deg, var(--goldLight), var(--gold), var(--orange));
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text;
+      text-transform:uppercase;
+      text-shadow:0 2px 4px rgba(0,0,0,.6);
+    }
+
+    .actions{
+      width:100%;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+      position:relative;
+      z-index:1;
+      flex:1;
+    }
+
+    .action{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      width:100%;
+      min-height:72px;
+      padding:12px 16px;
+      text-decoration:none;
+      color:var(--silverLight);
+      text-transform:uppercase;
+      font-weight:800;
+      letter-spacing:1px;
+      line-height:1.2;
+      border-radius:16px;
+      background:
+        linear-gradient(180deg, rgba(91,28,28,.95) 0%, rgba(74,28,28,.98) 100%);
+      border:2px solid transparent;
+      border-image:linear-gradient(180deg, var(--silver), var(--steelDark)) 1;
+      box-shadow:
+        0 8px 24px rgba(0,0,0,.6),
+        inset 0 1px 0 rgba(255,255,255,.2),
+        inset 0 -1px 0 rgba(0,0,0,.5);
+      transition:all .3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .action::before{
+      content:''; 
+      position:absolute;
+      inset:0;
+      background:linear-gradient(180deg, rgba(255,215,0,.1) 0%, transparent 50%);
+      opacity:0.6;
+      pointer-events:none;
+    }
+
+    .action::after{
+      content:'';
+      position:absolute;
+      top:0;
+      left:-100%;
+      width:100%;
+      height:100%;
+      background:linear-gradient(90deg, transparent, rgba(255,215,0,.15), transparent);
+      transition:left .6s;
+    }
+
+    .action:hover::after{
+      left:100%;
+    }
+
+    .action:hover{
+      transform:translateY(-3px) scale(1.02);
+      box-shadow:
+        0 12px 32px rgba(0,0,0,.7),
+        inset 0 1px 0 rgba(255,255,255,.3),
+        0 0 25px rgba(255,140,0,.3);
+      border-image:linear-gradient(180deg, var(--goldLight), var(--silver)) 1;
+    }
+
+    .action:active{
+      transform:translateY(-1px) scale(0.98);
+      box-shadow:
+        0 4px 16px rgba(0,0,0,.6),
+        inset 0 2px 4px rgba(0,0,0,.5);
+    }
+
+    .icon{
+      width:50px;
+      height:50px;
+      flex:0 0 50px;
+      border-radius:50%;
+      display:grid;
+      place-items:center;
+      font-size:24px;
+      color:#fff;
+      box-shadow:
+        inset 0 2px 6px rgba(255,255,255,.3),
+        inset 0 -2px 6px rgba(0,0,0,.4),
+        0 4px 12px rgba(0,0,0,.5);
+      text-shadow:0 2px 4px rgba(0,0,0,.7);
+      position:relative;
+      z-index:1;
+      border:2px solid rgba(255,255,255,.3);
+    }
+
+    .icon.whatsapp{
+      background:linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+    }
+
+    .icon.instagram{
+      background:linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+    }
+
+    .icon.location{
+      background:linear-gradient(135deg, var(--orange) 0%, var(--red) 100%);
+    }
+
+    .icon.phone{
+      background:linear-gradient(135deg, var(--red) 0%, var(--redDark) 100%);
+    }
+
+    .icon.promo{
+      background:linear-gradient(135deg, var(--gold) 0%, var(--orange) 100%);
+      color:#4a1c1c;
+    }
+
+    .label{
+      flex:1;
+      text-align:center;
+      font-size:clamp(0.85rem, 2.2vw, 0.95rem);
+      text-shadow:0 2px 4px rgba(0,0,0,.7);
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+    }
+
+    .label span{
+      display:block;
+    }
+
+    .label-small{
+      font-size:0.85em;
+      opacity:0.85;
+      font-weight:700;
+      color:var(--goldLight);
+    }
+
+    footer{
+      margin-top:auto;
+      padding:20px 18px 24px;
+      position:relative;
+      z-index:1;
+      text-align:center;
+      font-size:12px;
+      font-weight:600;
+      letter-spacing:1px;
+      background:linear-gradient(90deg, var(--gold), var(--orange), var(--gold));
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text;
+      width:100%;
+      border-top:1px solid rgba(255,215,0,.2);
+      text-shadow:0 0 20px rgba(255,215,0,.1);
+    }
+
+    @media (max-width: 420px){
+      body{
+        padding:14px;
+      }
+
+      .screen{
+        width:100%;
+        height:min(860px, 94vh);
+        border-radius:34px;
+        padding:28px 16px 16px;
+      }
+
+      .action{
+        min-height:68px;
+        padding:10px 14px;
+      }
+
+      .icon{
+        width:46px;
+        height:46px;
+        flex-basis:46px;
+        font-size:22px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <main class="screen">
+    <div class="hero">
+      <div class="logo-container">
+        <img class="logo" src="logo.png" alt="Performance Auto Center">
+      </div>
+
+      <div class="logo-text">PERFORMANCE<br>AUTO CENTER</div>
+
+      <div class="tagline">
+        CENTRO DE SERVIÇOS AUTOMOTIVOS<br>
+        DE ALTA PERFORMANCE
+      </div>
+    </div>
+
+    <div class="actions">
+      <a class="action" href="https://wa.me/5527999999999?text=Ol%C3%A1%2C%20quero%20agendar%20um%20servi%C3%A7o." target="_blank" rel="noopener noreferrer">
+        <div class="icon whatsapp"><i class="fab fa-whatsapp"></i></div>
+        <div class="label">
+          <span>AGENDE SEU SERVIÇO</span>
+          <span class="label-small">AGORA</span>
+        </div>
+      </a>
+
+      <a class="action" href="https://instagram.com/performance_auto" target="_blank" rel="noopener noreferrer">
+        <div class="icon instagram"><i class="fab fa-instagram"></i></div>
+        <div class="label">
+          <span>NOVIDADES E PROJETOS</span>
+          <span class="label-small">@PERFORMANCE_AUTO</span>
+        </div>
+      </a>
+
+      <a class="action" href="https://maps.google.com" target="_blank" rel="noopener noreferrer">
+        <div class="icon location"><i class="fas fa-map-marker-alt"></i></div>
+        <div class="label">
+          <span>COMO CHEGAR</span>
+          <span class="label-small">(NOSSA LOCALIZAÇÃO)</span>
+        </div>
+      </a>
+
+      <a class="action" href="tel:+5527999999999">
+        <div class="icon phone"><i class="fas fa-phone-alt"></i></div>
+        <div class="label">
+          <span>LIGUE PARA NÓS</span>
+          <span class="label-small">(FALE CONOSCO)</span>
+        </div>
+      </a>
+
+      <a class="action" href="#promocoes">
+        <div class="icon promo"><i class="fas fa-percentage"></i></div>
+        <div class="label">
+          <span>PROMOÇÕES E</span>
+          <span class="label-small">OFERTAS ESPECIAIS</span>
+        </div>
+      </a>
+    </div>
+
+    <footer>
+      Suporte Studio Giga @3dgiga
+    </footer>
+  </main>
+
+</body>
+</html>
