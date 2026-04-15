@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
   <style>
-    /* --- ESTILO VISUAL (Mantido igual ao seu original) --- */
+    /* --- ESTILO VISUAL --- */
     :root{ --bgDark:#2d0f0f; --bgPrimary:#4a1c1c; --bgSecondary:#5c2020; --bgLight:#6b2525; --gold:#ffd700; --goldLight:#ffb347; --orange:#ff8c00; --red:#dc143c; --silver:#c0c0c0; --silverLight:#e8e8e8; --silverDark:#8a8a8a; }
     *{margin:0;padding:0;box-sizing:border-box;} html,body{min-height:100%;}
     body{ font-family:'Montserrat',sans-serif; min-height:100vh; display:grid; place-items:center; padding:24px; overflow:auto; color:#fff; background:radial-gradient(circle at 50% 30%, rgba(255,140,0,.15), transparent 40%), linear-gradient(180deg, var(--bgSecondary) 0%, var(--bgPrimary) 50%, var(--bgDark) 100%); background-attachment:fixed; }
@@ -22,9 +22,23 @@
     /* Galeria */
     .gallery{ flex:1; width:100%; overflow-y:auto; padding:8px 4px; display:grid; grid-template-columns:repeat(2, 1fr); gap:12px; }
     .gallery::-webkit-scrollbar{width:4px;} .gallery::-webkit-scrollbar-thumb{background:var(--gold); border-radius:4px;}
+    
     .gallery-item{ aspect-ratio:1; border-radius:16px; overflow:hidden; position:relative; background:var(--bgPrimary); border:2px solid rgba(255,215,0,.3); cursor:pointer; transition:transform 0.3s; }
     .gallery-item:hover{ transform:scale(1.03); border-color:var(--gold); }
     .gallery-item img{ width:100%; height:100%; object-fit:cover; display:block; }
+    
+    /* Botão de Excluir (Só aparece para Admin) */
+    .btn-delete {
+      position: absolute; top: 8px; right: 8px;
+      width: 32px; height: 32px; border-radius: 50%;
+      background: rgba(220, 20, 60, 0.9); color: white;
+      border: 2px solid white; display: none; /* Escondido por padrão */
+      align-items: center; justify-content: center;
+      cursor: pointer; z-index: 10; font-size: 14px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    }
+    .gallery-item:hover .btn-delete { display: flex; } /* Aparece ao passar o mouse se admin */
+    
     .gallery-empty{ grid-column:1/-1; text-align:center; padding:40px; color:var(--silver); display:flex; flex-direction:column; align-items:center; gap:10px; }
     
     /* Admin Area */
@@ -128,7 +142,7 @@
 
   <script>
     // ==========================================
-    // CONFIGURAÇÕES (JÁ PREENCHIDAS COM SEUS DADOS)
+    // CONFIGURAÇÕES
     // ==========================================
     
     // 1. Sua Chave API do ImgBB
@@ -137,14 +151,15 @@
     // 2. URL do seu Google Apps Script (O "Robô")
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbysj-UnU2agy1GkcQUWtYBeSF5m-pMhbE8_CE-QyMECiXewFxS4BJWV5Tuh-0CExsJUjQ/exec';
 
-    // 3. Senha para você entrar no painel (Pode alterar se quiser)
-    const MY_PASSWORD = '1234'; 
+    // 3. Senha para você entrar no painel
+    const MY_PASSWORD = 'performance'; 
 
     // ==========================================
 
     const gallery = document.getElementById('gallery');
     const msgBox = document.getElementById('msgBox');
     let isAdmin = false;
+    let promosData = []; // Armazena os dados locally para poder excluir
 
     // AO CARREGAR A PÁGINA: Busca dados da Planilha
     window.onload = function() {
@@ -154,19 +169,20 @@
     // 1. FUNÇÃO PARA LER A PLANILHA (GET)
     async function fetchPromos() {
       try {
-        // Adicionamos um timestamp para evitar cache do navegador
         const response = await fetch(SCRIPT_URL + '?t=' + Date.now());
         const data = await response.json();
+        promosData = data || []; // Salva na variável global
         
-        if(!data || data.length === 0) {
+        if(promosData.length === 0) {
           gallery.innerHTML = '<div class="gallery-empty"><i class="fas fa-gift fa-2x"></i><p>Nenhuma promoção ativa no momento.</p></div>';
           return;
         }
 
         // Cria os cards da galeria
-        gallery.innerHTML = data.map(item => `
+        gallery.innerHTML = promosData.map((item, index) => `
           <div class="gallery-item" onclick="openModal('${item.image}')">
             <img src="${item.image}" alt="${item.title}" loading="lazy">
+            ${isAdmin ? `<button class="btn-delete" onclick="deletePromo(event, ${index})"><i class="fas fa-trash"></i></button>` : ''}
           </div>
         `).join('');
         
@@ -211,8 +227,6 @@
         // PASSO B: Enviar dados para o Google Script (Planilha)
         showMsg('Salvando na galeria...', 'loading');
         
-        // Usamos mode: 'no-cors' porque o Google Script redireciona e isso causa erro no fetch padrão, 
-        // mas o dado chega lá corretamente.
         await fetch(SCRIPT_URL, {
           method: 'POST',
           mode: 'no-cors', 
@@ -227,7 +241,6 @@
 
         showMsg('Sucesso! Promoção publicada.', 'success');
         
-        // Limpa formulário e recarrega galeria após 2 segundos
         setTimeout(() => {
           fileInput.value = '';
           titleInput.value = '';
@@ -239,6 +252,41 @@
         showMsg('Erro: ' + err.message, 'error');
         btn.disabled = false;
         btn.innerHTML = 'Tentar Novamente';
+      }
+    }
+
+    // 3. FUNÇÃO PARA EXCLUIR PROMOÇÃO
+    async function deletePromo(event, index) {
+      event.stopPropagation(); // Evita abrir o modal ao clicar na lixeira
+      
+      if(!confirm('Tem certeza que deseja excluir esta promoção?')) return;
+
+      const itemToDelete = promosData[index];
+      
+      // Feedback visual imediato
+      const btn = event.target.closest('.btn-delete');
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+      
+      try {
+        // Envia comando de exclusão para o Google Script
+        // O script precisa identificar qual linha apagar. Vamos usar o ID ou a URL da imagem como referência.
+        await fetch(SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            action: 'delete',
+            id: itemToDelete.id 
+          })
+        });
+        
+        alert('Promoção excluída com sucesso!');
+        location.reload();
+        
+      } catch (err) {
+        console.error(err);
+        alert('Erro ao excluir. Tente novamente.');
+        btn.innerHTML = '<i class="fas fa-trash"></i>';
       }
     }
 
@@ -255,6 +303,7 @@
         document.getElementById('loginSection').style.display = 'none';
         document.getElementById('uploadSection').style.display = 'block';
         showMsg('Logado como Admin.', 'success');
+        fetchPromos(); // Recarrega galeria para mostrar botões de excluir
       } else {
         showMsg('Senha incorreta.', 'error');
       }
@@ -265,6 +314,7 @@
       document.getElementById('loginSection').style.display = 'block';
       document.getElementById('uploadSection').style.display = 'none';
       document.getElementById('adminPass').value = '';
+      fetchPromos(); // Recarrega galeria para esconder botões de excluir
     }
 
     function openModal(src) {
