@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
   <style>
-    /* --- ESTILO VISUAL --- */
+    /* --- ESTILO VISUAL (Mantido) --- */
     :root{ --bgDark:#2d0f0f; --bgPrimary:#4a1c1c; --bgSecondary:#5c2020; --bgLight:#6b2525; --gold:#ffd700; --goldLight:#ffb347; --orange:#ff8c00; --red:#dc143c; --silver:#c0c0c0; --silverLight:#e8e8e8; --silverDark:#8a8a8a; }
     *{margin:0;padding:0;box-sizing:border-box;} html,body{min-height:100%;}
     body{ font-family:'Montserrat',sans-serif; min-height:100vh; display:grid; place-items:center; padding:24px; overflow:auto; color:#fff; background:radial-gradient(circle at 50% 30%, rgba(255,140,0,.15), transparent 40%), linear-gradient(180deg, var(--bgSecondary) 0%, var(--bgPrimary) 50%, var(--bgDark) 100%); background-attachment:fixed; }
@@ -19,7 +19,6 @@
     .btn-back:hover{ border-color:var(--gold); transform:translateX(-3px); }
     .page-title{ font-size:1.1rem; font-weight:800; color:var(--gold); text-transform:uppercase; letter-spacing:1px; }
     
-    /* Galeria */
     .gallery{ flex:1; width:100%; overflow-y:auto; padding:8px 4px; display:grid; grid-template-columns:repeat(2, 1fr); gap:12px; }
     .gallery::-webkit-scrollbar{width:4px;} .gallery::-webkit-scrollbar-thumb{background:var(--gold); border-radius:4px;}
     
@@ -27,7 +26,6 @@
     .gallery-item:hover{ transform:scale(1.03); border-color:var(--gold); }
     .gallery-item img{ width:100%; height:100%; object-fit:cover; display:block; }
     
-    /* Botão de Excluir */
     .btn-delete {
       position: absolute; top: 8px; right: 8px;
       width: 32px; height: 32px; border-radius: 50%;
@@ -38,12 +36,10 @@
       box-shadow: 0 2px 5px rgba(0,0,0,0.5); transition: 0.2s;
     }
     .btn-delete:hover { background: #ff0000; transform: scale(1.1); }
-    /* Mostra o botão apenas se o item tiver a classe 'admin-mode' */
     .gallery-item.admin-mode .btn-delete { display: flex; }
     
     .gallery-empty{ grid-column:1/-1; text-align:center; padding:40px; color:var(--silver); display:flex; flex-direction:column; align-items:center; gap:10px; }
     
-    /* Admin Area */
     .admin-toggle{ width:100%; padding:12px; text-align:center; border-top:1px solid rgba(255,215,0,.2); margin-top:auto; }
     .btn-admin{ background:transparent; border:2px dashed var(--silver); color:var(--silver); padding:8px 16px; border-radius:10px; font-weight:600; cursor:pointer; font-size:0.8rem; text-transform:uppercase; }
     .btn-admin:hover{ border-color:var(--gold); color:var(--gold); }
@@ -66,7 +62,6 @@
     .message.error{ background:rgba(220,20,60,.2); border:1px solid #dc143c; color:#faa; display:block; }
     .message.loading{ background:rgba(255,215,0,.2); border:1px solid var(--gold); color:var(--gold); display:block; }
 
-    /* Modal */
     .modal{ display:none; position:fixed; inset:0; background:rgba(0,0,0,.95); z-index:1000; justify-content:center; align-items:center; padding:20px; }
     .modal.active{ display:flex; animation:fadeIn 0.2s; }
     @keyframes fadeIn{ from{opacity:0;} to{opacity:1;} }
@@ -82,105 +77,67 @@
       <div class="page-title">🔥 Promoções</div>
     </div>
 
-    <!-- GALERIA -->
     <div class="gallery" id="gallery">
-      <div class="gallery-empty">
-        <i class="fas fa-spinner fa-spin fa-2x"></i>
-        <p>Carregando ofertas...</p>
-      </div>
+      <div class="gallery-empty"><i class="fas fa-spinner fa-spin fa-2x"></i><p>Carregando...</p></div>
     </div>
 
-    <!-- BOTÃO ADMIN -->
     <div class="admin-toggle">
-      <button class="btn-admin" onclick="toggleAdmin()">
-        <i class="fas fa-lock"></i> Área do Administrador
-      </button>
+      <button class="btn-admin" onclick="toggleAdmin()"><i class="fas fa-lock"></i> Área do Administrador</button>
     </div>
 
-    <!-- PAINEL ADMIN -->
     <div class="admin-panel" id="adminPanel">
-      
-      <!-- Login -->
       <div id="loginSection">
         <h3 style="color:var(--gold); margin-bottom:15px; text-align:center;">Acesso Restrito</h3>
-        <div class="form-group">
-          <label>Senha de Acesso:</label>
-          <input type="password" id="adminPass" placeholder="Digite a senha">
-        </div>
+        <div class="form-group"><label>Senha:</label><input type="password" id="adminPass" placeholder="Digite a senha"></div>
         <button class="btn-submit" onclick="checkLogin()">Entrar</button>
       </div>
 
-      <!-- Upload -->
       <div id="uploadSection" style="display:none;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
           <h3 style="color:var(--gold);">Nova Promoção</h3>
           <button onclick="logout()" style="background:none; border:none; color:var(--silver); cursor:pointer;"><i class="fas fa-sign-out-alt"></i> Sair</button>
         </div>
-
-        <div class="form-group">
-          <label>1. Escolha a Foto:</label>
-          <input type="file" id="promoFile" accept="image/*">
-        </div>
-        
-        <div class="form-group">
-          <label>2. Título da Oferta:</label>
-          <input type="text" id="promoTitle" placeholder="Ex: Alinhamento Grátis">
-        </div>
-
-        <button class="btn-submit" id="btnPost" onclick="postPromo()">
-          <i class="fas fa-cloud-upload-alt"></i> Publicar Agora
-        </button>
-        
+        <div class="form-group"><label>1. Foto:</label><input type="file" id="promoFile" accept="image/*"></div>
+        <div class="form-group"><label>2. Título:</label><input type="text" id="promoTitle" placeholder="Ex: Promoção Relâmpago"></div>
+        <button class="btn-submit" id="btnPost" onclick="postPromo()"><i class="fas fa-cloud-upload-alt"></i> Publicar</button>
         <div id="msgBox" class="message"></div>
       </div>
     </div>
   </main>
 
-  <!-- Modal -->
   <div class="modal" id="imgModal" onclick="this.classList.remove('active')">
     <span class="modal-close">&times;</span>
     <img id="modalImg" src="">
   </div>
 
   <script>
-    // ==========================================
-    // CONFIGURAÇÕES
-    // ==========================================
     const IMGBB_KEY = '492b2470652202fb94de6ed7a6a7c33f'; 
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbysj-UnU2agy1GkcQUWtYBeSF5m-pMhbE8_CE-QyMECiXewFxS4BJWV5Tuh-0CExsJUjQ/exec';
     const MY_PASSWORD = 'performance'; 
 
-    // ==========================================
-    // LÓGICA DO SISTEMA
-    // ==========================================
-    
     const gallery = document.getElementById('gallery');
     const msgBox = document.getElementById('msgBox');
     let isAdmin = false;
     let promosData = []; 
 
-    window.onload = function() {
-      fetchPromos();
-    };
+    window.onload = fetchPromos;
 
-    // 1. BUSCAR DADOS (Com filtro anti-fotos-vazias)
     async function fetchPromos() {
       try {
+        // Cache busting para garantir dados frescos
         const response = await fetch(SCRIPT_URL + '?t=' + Date.now());
         const data = await response.json();
         
-        // FILTRO: Só aceita itens que têm uma URL de imagem válida
-        promosData = (data || []).filter(item => item.image && item.image.length > 10);
+        // Filtra apenas itens válidos (com imagem)
+        promosData = (data || []).filter(item => item.image && String(item.image).startsWith('http'));
         
         renderGallery();
-        
       } catch (error) {
-        console.error("Erro:", error);
-        gallery.innerHTML = '<div class="gallery-empty"><i class="fas fa-exclamation-circle fa-2x"></i><p>Erro de conexão.</p></div>';
+        console.error(error);
+        gallery.innerHTML = '<div class="gallery-empty">Erro ao carregar.</div>';
       }
     }
 
-    // 2. RENDERIZAR GALERIA (Sem reload da página)
     function renderGallery() {
       if(promosData.length === 0) {
         gallery.innerHTML = '<div class="gallery-empty"><i class="fas fa-gift fa-2x"></i><p>Nenhuma promoção ativa.</p></div>';
@@ -189,122 +146,96 @@
 
       gallery.innerHTML = promosData.map((item, index) => `
         <div class="gallery-item ${isAdmin ? 'admin-mode' : ''}" onclick="openModal('${item.image}')">
-          <img src="${item.image}" alt="${item.title}" loading="lazy">
-          <button class="btn-delete" onclick="deletePromo(event, ${index})">
+          <img src="${item.image}" loading="lazy">
+          <button class="btn-delete" onclick="deletePromo(event, '${item.id}')">
             <i class="fas fa-trash"></i>
           </button>
         </div>
       `).join('');
     }
 
-    // 3. PUBLICAR PROMOÇÃO
     async function postPromo() {
       const fileInput = document.getElementById('promoFile');
       const titleInput = document.getElementById('promoTitle');
       const btn = document.getElementById('btnPost');
 
-      if(fileInput.files.length === 0) {
-        showMsg('Selecione uma foto.', 'error');
-        return;
-      }
+      if(fileInput.files.length === 0) return showMsg('Selecione uma foto.', 'error');
       
       btn.disabled = true;
       btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
-      showMsg('Processando imagem...', 'loading');
+      showMsg('Enviando...', 'loading');
 
       try {
-        // Upload ImgBB
         const formData = new FormData();
         formData.append('image', fileInput.files[0]);
         formData.append('key', IMGBB_KEY);
 
         const imgResp = await fetch('https://api.imgbb.com/1/upload', { method: 'POST', body: formData });
         const imgData = await imgResp.json();
-
-        if(!imgData.success) throw new Error('Erro no ImgBB');
+        if(!imgData.success) throw new Error('Erro ImgBB');
 
         const imageUrl = imgData.data.url;
         const title = titleInput.value.trim() || 'Promoção';
-        
-        // Salvar no Google Sheets
-        showMsg('Salvando dados...', 'loading');
+        const newId = Date.now().toString(); // Garante ID como string
         
         await fetch(SCRIPT_URL, {
           method: 'POST',
-          mode: 'no-cors', 
+          mode: 'no-cors',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            id: Date.now(), 
-            image: imageUrl, 
-            title: title, 
-            date: new Date().toLocaleDateString() 
-          })
+          body: JSON.stringify({ id: newId, image: imageUrl, title: title, date: new Date().toLocaleDateString() })
         });
 
-        showMsg('Publicado com sucesso!', 'success');
-        
-        // Limpa form e atualiza galeria SEM deslogar
+        showMsg('Sucesso!', 'success');
         setTimeout(() => {
           fileInput.value = '';
           titleInput.value = '';
           btn.disabled = false;
-          btn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Publicar Agora';
-          fetchPromos(); // Recarrega apenas a lista
+          btn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Publicar';
+          fetchPromos();
         }, 1500);
 
       } catch (err) {
         showMsg('Erro: ' + err.message, 'error');
         btn.disabled = false;
-        btn.innerHTML = 'Tentar Novamente';
       }
     }
 
-    // 4. EXCLUIR PROMOÇÃO (Sem deslogar)
-    async function deletePromo(event, index) {
-      event.stopPropagation(); // Não abrir modal
-      
+    async function deletePromo(event, id) {
+      event.stopPropagation();
       if(!confirm('Excluir esta promoção?')) return;
 
-      const itemToDelete = promosData[index];
+      // Feedback visual imediato no botão
       const btn = event.currentTarget;
-      const originalIcon = btn.innerHTML;
-      
       btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-      btn.style.pointerEvents = 'none';
-
+      
       try {
+        // Envia ID como string para garantir compatibilidade
         await fetch(SCRIPT_URL, {
           method: 'POST',
           mode: 'no-cors',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'delete', id: itemToDelete.id })
+          body: JSON.stringify({ action: 'delete', id: String(id) })
         });
         
-        // Atualiza a lista localmente e renderiza novamente
-        // Mantém o estado de admin ativo
-        fetchPromos(); 
+        // Aguarda 1.5s para o Google processar e recarrega a lista
+        setTimeout(() => {
+           fetchPromos();
+        }, 1500);
         
       } catch (err) {
         alert('Erro ao excluir.');
-        btn.innerHTML = originalIcon;
-        btn.style.pointerEvents = 'auto';
+        btn.innerHTML = '<i class="fas fa-trash"></i>';
       }
     }
 
-    // --- CONTROLE DE ADMIN ---
-
-    function toggleAdmin() {
-      document.getElementById('adminPanel').classList.toggle('active');
-    }
+    function toggleAdmin() { document.getElementById('adminPanel').classList.toggle('active'); }
 
     function checkLogin() {
-      const pass = document.getElementById('adminPass').value;
-      if(pass === MY_PASSWORD) {
+      if(document.getElementById('adminPass').value === MY_PASSWORD) {
         isAdmin = true;
         document.getElementById('loginSection').style.display = 'none';
         document.getElementById('uploadSection').style.display = 'block';
-        renderGallery(); // Re-renderiza para mostrar botões de excluir
-        showMsg('Logado.', 'success');
+        renderGallery();
       } else {
         showMsg('Senha incorreta.', 'error');
       }
@@ -314,8 +245,7 @@
       isAdmin = false;
       document.getElementById('loginSection').style.display = 'block';
       document.getElementById('uploadSection').style.display = 'none';
-      document.getElementById('adminPass').value = '';
-      renderGallery(); // Re-renderiza para esconder botões de excluir
+      renderGallery();
     }
 
     function openModal(src) {
