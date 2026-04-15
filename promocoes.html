@@ -27,17 +27,19 @@
     .gallery-item:hover{ transform:scale(1.03); border-color:var(--gold); }
     .gallery-item img{ width:100%; height:100%; object-fit:cover; display:block; }
     
-    /* Botão de Excluir (Só aparece para Admin) */
+    /* Botão de Excluir */
     .btn-delete {
       position: absolute; top: 8px; right: 8px;
       width: 32px; height: 32px; border-radius: 50%;
-      background: rgba(220, 20, 60, 0.9); color: white;
-      border: 2px solid white; display: none; /* Escondido por padrão */
+      background: rgba(220, 20, 60, 0.95); color: white;
+      border: 2px solid white; display: none; 
       align-items: center; justify-content: center;
       cursor: pointer; z-index: 10; font-size: 14px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.5); transition: 0.2s;
     }
-    .gallery-item:hover .btn-delete { display: flex; } /* Aparece ao passar o mouse se admin */
+    .btn-delete:hover { background: #ff0000; transform: scale(1.1); }
+    /* Mostra o botão apenas se o item tiver a classe 'admin-mode' */
+    .gallery-item.admin-mode .btn-delete { display: flex; }
     
     .gallery-empty{ grid-column:1/-1; text-align:center; padding:40px; color:var(--silver); display:flex; flex-direction:column; align-items:center; gap:10px; }
     
@@ -80,7 +82,7 @@
       <div class="page-title">🔥 Promoções</div>
     </div>
 
-    <!-- GALERIA (Visível para Clientes) -->
+    <!-- GALERIA -->
     <div class="gallery" id="gallery">
       <div class="gallery-empty">
         <i class="fas fa-spinner fa-spin fa-2x"></i>
@@ -88,17 +90,17 @@
       </div>
     </div>
 
-    <!-- BOTÃO ADMIN (Rodapé) -->
+    <!-- BOTÃO ADMIN -->
     <div class="admin-toggle">
       <button class="btn-admin" onclick="toggleAdmin()">
         <i class="fas fa-lock"></i> Área do Administrador
       </button>
     </div>
 
-    <!-- PAINEL ADMIN (Escondido) -->
+    <!-- PAINEL ADMIN -->
     <div class="admin-panel" id="adminPanel">
       
-      <!-- Tela de Login -->
+      <!-- Login -->
       <div id="loginSection">
         <h3 style="color:var(--gold); margin-bottom:15px; text-align:center;">Acesso Restrito</h3>
         <div class="form-group">
@@ -108,7 +110,7 @@
         <button class="btn-submit" onclick="checkLogin()">Entrar</button>
       </div>
 
-      <!-- Tela de Upload (Só aparece após login) -->
+      <!-- Upload -->
       <div id="uploadSection" style="display:none;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
           <h3 style="color:var(--gold);">Nova Promoção</h3>
@@ -134,7 +136,7 @@
     </div>
   </main>
 
-  <!-- Modal para ver foto grande -->
+  <!-- Modal -->
   <div class="modal" id="imgModal" onclick="this.classList.remove('active')">
     <span class="modal-close">&times;</span>
     <img id="modalImg" src="">
@@ -144,88 +146,88 @@
     // ==========================================
     // CONFIGURAÇÕES
     // ==========================================
-    
-    // 1. Sua Chave API do ImgBB
     const IMGBB_KEY = '492b2470652202fb94de6ed7a6a7c33f'; 
-
-    // 2. URL do seu Google Apps Script (O "Robô")
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbysj-UnU2agy1GkcQUWtYBeSF5m-pMhbE8_CE-QyMECiXewFxS4BJWV5Tuh-0CExsJUjQ/exec';
-
-    // 3. Senha para você entrar no painel
     const MY_PASSWORD = 'performance'; 
 
     // ==========================================
-
+    // LÓGICA DO SISTEMA
+    // ==========================================
+    
     const gallery = document.getElementById('gallery');
     const msgBox = document.getElementById('msgBox');
     let isAdmin = false;
-    let promosData = []; // Armazena os dados locally para poder excluir
+    let promosData = []; 
 
-    // AO CARREGAR A PÁGINA: Busca dados da Planilha
     window.onload = function() {
       fetchPromos();
     };
 
-    // 1. FUNÇÃO PARA LER A PLANILHA (GET)
+    // 1. BUSCAR DADOS (Com filtro anti-fotos-vazias)
     async function fetchPromos() {
       try {
         const response = await fetch(SCRIPT_URL + '?t=' + Date.now());
         const data = await response.json();
-        promosData = data || []; // Salva na variável global
         
-        if(promosData.length === 0) {
-          gallery.innerHTML = '<div class="gallery-empty"><i class="fas fa-gift fa-2x"></i><p>Nenhuma promoção ativa no momento.</p></div>';
-          return;
-        }
-
-        // Cria os cards da galeria
-        gallery.innerHTML = promosData.map((item, index) => `
-          <div class="gallery-item" onclick="openModal('${item.image}')">
-            <img src="${item.image}" alt="${item.title}" loading="lazy">
-            ${isAdmin ? `<button class="btn-delete" onclick="deletePromo(event, ${index})"><i class="fas fa-trash"></i></button>` : ''}
-          </div>
-        `).join('');
+        // FILTRO: Só aceita itens que têm uma URL de imagem válida
+        promosData = (data || []).filter(item => item.image && item.image.length > 10);
+        
+        renderGallery();
         
       } catch (error) {
-        console.error("Erro ao ler planilha:", error);
-        gallery.innerHTML = '<div class="gallery-empty"><i class="fas fa-exclamation-circle fa-2x"></i><p>Erro ao carregar promoções.</p></div>';
+        console.error("Erro:", error);
+        gallery.innerHTML = '<div class="gallery-empty"><i class="fas fa-exclamation-circle fa-2x"></i><p>Erro de conexão.</p></div>';
       }
     }
 
-    // 2. FUNÇÃO PARA POSTAR (UPLOAD + SALVAR NA PLANILHA)
+    // 2. RENDERIZAR GALERIA (Sem reload da página)
+    function renderGallery() {
+      if(promosData.length === 0) {
+        gallery.innerHTML = '<div class="gallery-empty"><i class="fas fa-gift fa-2x"></i><p>Nenhuma promoção ativa.</p></div>';
+        return;
+      }
+
+      gallery.innerHTML = promosData.map((item, index) => `
+        <div class="gallery-item ${isAdmin ? 'admin-mode' : ''}" onclick="openModal('${item.image}')">
+          <img src="${item.image}" alt="${item.title}" loading="lazy">
+          <button class="btn-delete" onclick="deletePromo(event, ${index})">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      `).join('');
+    }
+
+    // 3. PUBLICAR PROMOÇÃO
     async function postPromo() {
       const fileInput = document.getElementById('promoFile');
       const titleInput = document.getElementById('promoTitle');
       const btn = document.getElementById('btnPost');
 
       if(fileInput.files.length === 0) {
-        showMsg('Por favor, selecione uma foto.', 'error');
+        showMsg('Selecione uma foto.', 'error');
         return;
       }
       
       btn.disabled = true;
       btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
-      showMsg('Enviando imagem para nuvem...', 'loading');
+      showMsg('Processando imagem...', 'loading');
 
       try {
-        // PASSO A: Enviar imagem para ImgBB
+        // Upload ImgBB
         const formData = new FormData();
         formData.append('image', fileInput.files[0]);
         formData.append('key', IMGBB_KEY);
 
-        const imgResp = await fetch('https://api.imgbb.com/1/upload', {
-          method: 'POST',
-          body: formData
-        });
+        const imgResp = await fetch('https://api.imgbb.com/1/upload', { method: 'POST', body: formData });
         const imgData = await imgResp.json();
 
-        if(!imgData.success) throw new Error('Falha no ImgBB');
+        if(!imgData.success) throw new Error('Erro no ImgBB');
 
         const imageUrl = imgData.data.url;
-        const title = titleInput.value.trim() || 'Promoção Especial';
+        const title = titleInput.value.trim() || 'Promoção';
         
-        // PASSO B: Enviar dados para o Google Script (Planilha)
-        showMsg('Salvando na galeria...', 'loading');
+        // Salvar no Google Sheets
+        showMsg('Salvando dados...', 'loading');
         
         await fetch(SCRIPT_URL, {
           method: 'POST',
@@ -239,58 +241,57 @@
           })
         });
 
-        showMsg('Sucesso! Promoção publicada.', 'success');
+        showMsg('Publicado com sucesso!', 'success');
         
+        // Limpa form e atualiza galeria SEM deslogar
         setTimeout(() => {
           fileInput.value = '';
           titleInput.value = '';
-          location.reload(); 
-        }, 2000);
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Publicar Agora';
+          fetchPromos(); // Recarrega apenas a lista
+        }, 1500);
 
       } catch (err) {
-        console.error(err);
         showMsg('Erro: ' + err.message, 'error');
         btn.disabled = false;
         btn.innerHTML = 'Tentar Novamente';
       }
     }
 
-    // 3. FUNÇÃO PARA EXCLUIR PROMOÇÃO
+    // 4. EXCLUIR PROMOÇÃO (Sem deslogar)
     async function deletePromo(event, index) {
-      event.stopPropagation(); // Evita abrir o modal ao clicar na lixeira
+      event.stopPropagation(); // Não abrir modal
       
-      if(!confirm('Tem certeza que deseja excluir esta promoção?')) return;
+      if(!confirm('Excluir esta promoção?')) return;
 
       const itemToDelete = promosData[index];
+      const btn = event.currentTarget;
+      const originalIcon = btn.innerHTML;
       
-      // Feedback visual imediato
-      const btn = event.target.closest('.btn-delete');
       btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-      
+      btn.style.pointerEvents = 'none';
+
       try {
-        // Envia comando de exclusão para o Google Script
-        // O script precisa identificar qual linha apagar. Vamos usar o ID ou a URL da imagem como referência.
         await fetch(SCRIPT_URL, {
           method: 'POST',
           mode: 'no-cors',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            action: 'delete',
-            id: itemToDelete.id 
-          })
+          body: JSON.stringify({ action: 'delete', id: itemToDelete.id })
         });
         
-        alert('Promoção excluída com sucesso!');
-        location.reload();
+        // Atualiza a lista localmente e renderiza novamente
+        // Mantém o estado de admin ativo
+        fetchPromos(); 
         
       } catch (err) {
-        console.error(err);
-        alert('Erro ao excluir. Tente novamente.');
-        btn.innerHTML = '<i class="fas fa-trash"></i>';
+        alert('Erro ao excluir.');
+        btn.innerHTML = originalIcon;
+        btn.style.pointerEvents = 'auto';
       }
     }
 
-    // --- Funções de Interface ---
+    // --- CONTROLE DE ADMIN ---
 
     function toggleAdmin() {
       document.getElementById('adminPanel').classList.toggle('active');
@@ -302,8 +303,8 @@
         isAdmin = true;
         document.getElementById('loginSection').style.display = 'none';
         document.getElementById('uploadSection').style.display = 'block';
-        showMsg('Logado como Admin.', 'success');
-        fetchPromos(); // Recarrega galeria para mostrar botões de excluir
+        renderGallery(); // Re-renderiza para mostrar botões de excluir
+        showMsg('Logado.', 'success');
       } else {
         showMsg('Senha incorreta.', 'error');
       }
@@ -314,7 +315,7 @@
       document.getElementById('loginSection').style.display = 'block';
       document.getElementById('uploadSection').style.display = 'none';
       document.getElementById('adminPass').value = '';
-      fetchPromos(); // Recarrega galeria para esconder botões de excluir
+      renderGallery(); // Re-renderiza para esconder botões de excluir
     }
 
     function openModal(src) {
