@@ -1,269 +1,6 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Promoções - Performance Auto Center</title>
-
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-  <style>
-    :root{
-      --bgDark:#2d0f0f; --bgPrimary:#4a1c1c; --bgSecondary:#5c2020; --bgLight:#6b2525;
-      --gold:#ffd700; --goldLight:#ffb347; --orange:#ff8c00; --orangeRed:#ff4500; --red:#dc143c; --redDark:#8b0000;
-      --silver:#c0c0c0; --silverLight:#e8e8e8; --silverDark:#8a8a8a; --steel:#b8b8b8;
-      --text:#ffffff; --textMuted:#d4af37;
-    }
-    *{margin:0;padding:0;box-sizing:border-box;}
-    html,body{min-height:100%;}
-    body{
-      font-family:'Montserrat',sans-serif; min-height:100vh; display:grid; place-items:center;
-      padding:24px; overflow:auto; color:#fff;
-      background:radial-gradient(circle at 50% 30%, rgba(255,140,0,.15), transparent 40%),
-                 radial-gradient(circle at 70% 50%, rgba(220,20,60,.1), transparent 35%),
-                 linear-gradient(180deg, var(--bgSecondary) 0%, var(--bgPrimary) 50%, var(--bgDark) 100%);
-      background-attachment:fixed;
-    }
-    .screen{
-      width:min(390px, 95vw); height:min(860px, 92vh); border-radius:44px; overflow:hidden;
-      position:relative;
-      background:radial-gradient(circle at 50% 0%, rgba(255,215,0,.08), transparent 35%),
-                 linear-gradient(180deg, var(--bgSecondary) 0%, var(--bgPrimary) 60%, var(--bgDark) 100%);
-      box-shadow:0 30px 80px rgba(0,0,0,.8), inset 0 0 0 1px rgba(255,255,255,.08), inset 0 0 60px rgba(0,0,0,.5);
-      display:flex; flex-direction:column; align-items:center; padding:24px 16px 16px;
-    }
-    .header{
-      width:100%; display:flex; align-items:center; justify-content:space-between;
-      padding:8px 0 16px; border-bottom:1px solid rgba(255,215,0,.2); margin-bottom:16px;
-    }
-    .btn-back{
-      background:linear-gradient(135deg, var(--bgLight), var(--bgPrimary));
-      border:2px solid var(--silver); color:var(--silverLight); padding:8px 16px;
-      border-radius:12px; text-decoration:none; font-weight:700; font-size:0.85rem;
-      display:flex; align-items:center; gap:8px; transition:all .3s;
-    }
-    .btn-back:hover{transform:translateX(-3px); border-color:var(--gold); box-shadow:0 0 15px rgba(255,215,0,.3);}
-    .page-title{
-      font-size:1.1rem; font-weight:800; letter-spacing:1px; text-transform:uppercase;
-      background:linear-gradient(90deg, var(--goldLight), var(--gold), var(--orange));
-      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-    }
-    
-    /* Gallery Grid */
-    .gallery{
-      flex:1; width:100%; overflow-y:auto; padding:8px 4px;
-      display:grid; grid-template-columns:repeat(2, 1fr); gap:12px;
-    }
-    .gallery::-webkit-scrollbar{width:6px;}
-    .gallery::-webkit-scrollbar-track{background:rgba(255,255,255,.05); border-radius:3px;}
-    .gallery::-webkit-scrollbar-thumb{background:var(--gold); border-radius:3px;}
-    
-    .gallery-item{
-      aspect-ratio:1; border-radius:16px; overflow:hidden; position:relative;
-      background:linear-gradient(135deg, var(--bgPrimary), var(--bgDark));
-      border:2px solid rgba(255,215,0,.3); box-shadow:0 8px 20px rgba(0,0,0,.5);
-      transition:transform .3s, box-shadow .3s; cursor:pointer;
-    }
-    .gallery-item:hover{transform:scale(1.03); box-shadow:0 12px 30px rgba(255,140,0,.4);}
-    .gallery-item img{
-      width:100%; height:100%; object-fit:cover; display:block;
-      transition:transform .5s;
-    }
-    .gallery-item:hover img{transform:scale(1.1);}
-    .gallery-empty{
-      grid-column:1/-1; text-align:center; padding:40px 20px; color:var(--silver);
-      font-size:0.9rem; display:flex; flex-direction:column; align-items:center; gap:12px;
-    }
-    .gallery-empty i{font-size:2.5rem; opacity:.5;}
-    
-    /* Admin Section */
-    .admin-toggle{
-      width:100%; padding:12px; text-align:center; border-top:1px solid rgba(255,215,0,.2);
-    }
-    .btn-admin{
-      background:transparent; border:2px dashed var(--silver); color:var(--silver);
-      padding:8px 16px; border-radius:10px; font-size:0.8rem; font-weight:600;
-      cursor:pointer; transition:all .3s; text-transform:uppercase; letter-spacing:1px;
-    }
-    .btn-admin:hover{border-color:var(--gold); color:var(--gold);}
-    
-    .admin-panel{
-      display:none; width:100%; padding:16px; background:rgba(45,15,15,.9);
-      border-radius:16px; border:2px solid var(--gold); margin-top:12px;
-    }
-    .admin-panel.active{display:block; animation:slideIn .3s ease;}
-    @keyframes slideIn{from{opacity:0; transform:translateY(-10px);} to{opacity:1; transform:translateY(0);}}
-    
-    .form-group{margin-bottom:14px;}
-    .form-group label{
-      display:block; font-size:0.8rem; font-weight:700; color:var(--goldLight);
-      margin-bottom:6px; text-transform:uppercase; letter-spacing:1px;
-    }
-    .form-group input, .form-group textarea{
-      width:100%; padding:10px 12px; border-radius:10px; border:2px solid var(--silverDark);
-      background:rgba(255,255,255,.05); color:#fff; font-family:inherit; font-size:0.9rem;
-      transition:border-color .3s;
-    }
-    .form-group input:focus, .form-group textarea:focus{
-      outline:none; border-color:var(--gold); box-shadow:0 0 0 3px rgba(255,215,0,.2);
-    }
-    .form-group input[type="file"]{
-      padding:8px; background:rgba(255,215,0,.1); border-color:var(--gold);
-    }
-    .btn-submit{
-      width:100%; padding:12px; border:none; border-radius:12px;
-      background:linear-gradient(135deg, var(--gold), var(--orange));
-      color:#2d0f0f; font-weight:800; font-size:0.95rem; text-transform:uppercase;
-      letter-spacing:1px; cursor:pointer; transition:transform .2s, box-shadow .2s;
-    }
-    .btn-submit:hover{transform:translateY(-2px); box-shadow:0 8px 25px rgba(255,140,0,.5);}
-    .btn-submit:active{transform:translateY(0);}
-    
-    .btn-logout{
-      background:linear-gradient(135deg, var(--red), var(--redDark));
-      color:#fff; border:none; padding:6px 14px; border-radius:8px;
-      font-size:0.75rem; font-weight:700; cursor:pointer; margin-left:auto;
-      display:flex; align-items:center; gap:6px; transition:all .3s;
-    }
-    .btn-logout:hover{transform:translateX(3px); box-shadow:0 0 15px rgba(220,20,60,.5);}
-    
-    .admin-header{
-      display:flex; align-items:center; justify-content:space-between;
-      padding-bottom:12px; border-bottom:1px solid rgba(255,215,0,.2); margin-bottom:12px;
-    }
-    .admin-title{
-      font-size:0.9rem; font-weight:800; color:var(--gold); text-transform:uppercase;
-      letter-spacing:1px; display:flex; align-items:center; gap:8px;
-    }
-    
-    /* Modal para visualizar imagem */
-    .modal{
-      display:none; position:fixed; inset:0; background:rgba(0,0,0,.95);
-      z-index:1000; justify-content:center; align-items:center; padding:20px;
-      animation:fadeIn .2s ease;
-    }
-    .modal.active{display:flex;}
-    @keyframes fadeIn{from{opacity:0;} to{opacity:1;}}
-    .modal-content{
-      max-width:90%; max-height:90%; border-radius:20px; overflow:hidden;
-      border:3px solid var(--gold); box-shadow:0 0 50px rgba(255,215,0,.4);
-    }
-    .modal-content img{max-width:100%; max-height:90vh; display:block;}
-    .modal-close{
-      position:absolute; top:20px; right:20px; width:40px; height:40px;
-      border-radius:50%; background:var(--red); color:#fff; border:none;
-      font-size:1.2rem; cursor:pointer; display:grid; place-items:center;
-      transition:transform .2s;
-    }
-    .modal-close:hover{transform:rotate(90deg) scale(1.1);}
-    
-    /* Mensagens */
-    .message{
-      padding:10px 14px; border-radius:10px; margin-bottom:12px; font-size:0.85rem;
-      font-weight:600; display:none;
-    }
-    .message.success{background:rgba(37,211,102,.2); border:1px solid #25D366; color:#25D366; display:block;}
-    .message.error{background:rgba(220,20,60,.2); border:1px solid #dc143c; color:#ff6b6b; display:block;}
-    
-    footer{
-      padding:16px 18px 20px; text-align:center; font-size:11px; font-weight:600;
-      letter-spacing:1px; background:linear-gradient(90deg, var(--gold), var(--orange), var(--gold));
-      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-      width:100%; border-top:1px solid rgba(255,215,0,.2); margin-top:auto;
-    }
-    
-    @media (max-width:420px){
-      body{padding:14px;}
-      .screen{width:100%; height:min(860px,94vh); border-radius:34px; padding:20px 12px 12px;}
-      .gallery{grid-template-columns:repeat(2,1fr); gap:10px;}
-    }
-  </style>
-</head>
-<body>
-  <main class="screen">
-    <!-- Header -->
-    <div class="header">
-      <a href="index.html" class="btn-back">
-        <i class="fas fa-arrow-left"></i> VOLTAR
-      </a>
-      <div class="page-title">🔥 Promoções</div>
-      <div id="adminStatus"></div>
-    </div>
-
-    <!-- Gallery -->
-    <div class="gallery" id="gallery">
-      <!-- Imagens serão carregadas aqui -->
-    </div>
-
-    <!-- Admin Toggle -->
-    <div class="admin-toggle">
-      <button class="btn-admin" id="toggleAdmin">
-        <i class="fas fa-lock"></i> Área do Administrador
-      </button>
-    </div>
-
-    <!-- Admin Panel -->
-    <div class="admin-panel" id="adminPanel">
-      <div class="admin-header">
-        <div class="admin-title"><i class="fas fa-user-shield"></i> Painel Admin</div>
-        <button class="btn-logout" id="btnLogout" style="display:none;">
-          <i class="fas fa-sign-out-alt"></i> Sair
-        </button>
-      </div>
-
-      <!-- Login Form -->
-      <form id="loginForm">
-        <div class="form-group">
-          <label><i class="fas fa-user"></i> Usuário</label>
-          <input type="text" id="username" placeholder="Digite o usuário" required>
-        </div>
-        <div class="form-group">
-          <label><i class="fas fa-key"></i> Senha</label>
-          <input type="password" id="password" placeholder="Digite a senha" required>
-        </div>
-        <button type="submit" class="btn-submit">Entrar</button>
-        <div id="loginMessage" class="message"></div>
-      </form>
-
-      <!-- Upload Form (aparece após login) -->
-      <form id="uploadForm" style="display:none; margin-top:16px; padding-top:16px; border-top:1px dashed var(--silver);">
-        <div class="form-group">
-          <label><i class="fas fa-image"></i> Foto da Promoção</label>
-          <input type="file" id="promoImage" accept="image/*" required>
-        </div>
-        <div class="form-group">
-          <label><i class="fas fa-tag"></i> Título (opcional)</label>
-          <input type="text" id="promoTitle" placeholder="Ex: Troca de Óleo 20% OFF" maxlength="50">
-        </div>
-        <div class="form-group">
-          <label><i class="fas fa-comment"></i> Descrição (opcional)</label>
-          <textarea id="promoDesc" placeholder="Detalhes da promoção..." rows="2" maxlength="150"></textarea>
-        </div>
-        <button type="submit" class="btn-submit">
-          <i class="fas fa-upload"></i> Publicar Promoção
-        </button>
-        <div id="uploadMessage" class="message"></div>
-      </form>
-    </div>
-
-    <footer>
-      Suporte Studio Giga @3dgiga • Promoções Atualizadas
-    </footer>
-  </main>
-
-  <!-- Modal para visualizar imagem -->
-  <div class="modal" id="imageModal">
-    <button class="modal-close" id="modalClose"><i class="fas fa-times"></i></button>
-    <div class="modal-content">
-      <img id="modalImg" src="" alt="Promoção">
-    </div>
-  </div>
-
-  <script>
-    // === CONFIGURAÇÃO ===
-    const ADMIN_CREDENTIALS = { user: 'admin', pass: 'performance2024' }; // ⚠️ Troque em produção!
-    const MAX_IMAGES = 20; // Limite de imagens armazenadas
+  <script type="module">
+    // Importar configurações do Firebase (arquivo local)
+    import { auth, db, storage, signInWithEmailAndPassword, signOut, onAuthStateChanged, collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc, ref, uploadBytes, getDownloadURL, deleteObject } from './firebase-config.js';
 
     // === ELEMENTOS DOM ===
     const gallery = document.getElementById('gallery');
@@ -279,78 +16,95 @@
     const modalImg = document.getElementById('modalImg');
     const modalClose = document.getElementById('modalClose');
 
-    // === ESTADO ===
-    let isAdmin = sessionStorage.getItem('adminLogged') === 'true';
+    let isAdmin = false;
+    let unsubscribeGallery = null;
 
     // === INICIALIZAÇÃO ===
     document.addEventListener('DOMContentLoaded', () => {
-      updateAdminUI();
-      loadGallery();
+      // Observar estado de autenticação
+      onAuthStateChanged(auth, (user) => {
+        isAdmin = !!user;
+        updateAdminUI();
+        if (isAdmin) showUploadForm();
+      });
+
+      // Carregar galeria em tempo real
+      loadGalleryRealtime();
+
+      // Toggle do painel admin
+      toggleAdmin.addEventListener('click', () => {
+        adminPanel.classList.toggle('active');
+      });
     });
 
-    // === CARREGAR GALERIA ===
-    function loadGallery() {
-      const promos = JSON.parse(localStorage.getItem('promocoes') || '[]');
+    // === CARREGAR GALERIA (REAL-TIME) ===
+    function loadGalleryRealtime() {
+      const q = query(collection(db, 'promocoes'), orderBy('createdAt', 'desc'));
       
-      if (promos.length === 0) {
-        gallery.innerHTML = `
-          <div class="gallery-empty">
-            <i class="fas fa-gift"></i>
-            <div>Nenhuma promoção ativa no momento.</div>
-            <div style="font-size:0.8rem; opacity:.7;">Volte em breve para conferir ofertas exclusivas!</div>
-          </div>
-        `;
-        return;
-      }
+      unsubscribeGallery = onSnapshot(q, (snapshot) => {
+        if (snapshot.empty) {
+          gallery.innerHTML = `
+            <div class="gallery-empty">
+              <i class="fas fa-gift"></i>
+              <div>Nenhuma promoção ativa no momento.</div>
+              <div style="font-size:0.8rem; opacity:.7;">Volte em breve para conferir ofertas exclusivas!</div>
+            </div>
+          `;
+          return;
+        }
 
-      gallery.innerHTML = promos.map((p, i) => `
-        <div class="gallery-item" onclick="openModal('${p.image}')">
-          <img src="${p.image}" alt="${p.title || 'Promoção'}" loading="lazy">
-        </div>
-      `).join('');
+        gallery.innerHTML = snapshot.docs.map(docSnap => {
+          const p = docSnap.data();
+          return `
+            <div class="gallery-item" onclick="window.openModal('${p.imageUrl}')">
+              <img src="${p.imageUrl}" alt="${p.title || 'Promoção'}" loading="lazy">
+              ${isAdmin ? `<button class="btn-delete" data-id="${docSnap.id}" onclick="window.deletePromo(event, '${docSnap.id}')"><i class="fas fa-trash"></i></button>` : ''}
+            </div>
+          `;
+        }).join('');
+      }, (error) => {
+        console.error('Erro ao carregar promoções:', error);
+        gallery.innerHTML = `<div class="gallery-empty"><i class="fas fa-exclamation-triangle"></i><div>Erro ao carregar promoções.</div></div>`;
+      });
     }
 
-    // === TOGGLE ADMIN PANEL ===
-    toggleAdmin.addEventListener('click', () => {
-      adminPanel.classList.toggle('active');
-      if (adminPanel.classList.contains('active') && isAdmin) {
-        showUploadForm();
-      }
-    });
-
     // === LOGIN ===
-    loginForm.addEventListener('submit', (e) => {
+    loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const user = document.getElementById('username').value;
-      const pass = document.getElementById('password').value;
+      const email = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
 
-      if (user === ADMIN_CREDENTIALS.user && pass === ADMIN_CREDENTIALS.pass) {
-        sessionStorage.setItem('adminLogged', 'true');
-        isAdmin = true;
-        updateAdminUI();
-        showUploadForm();
-        showMessage(loginMessage, 'Login realizado com sucesso!', 'success');
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        showMessage(loginMessage, 'Login realizado com sucesso! ✨', 'success');
         loginForm.reset();
-      } else {
-        showMessage(loginMessage, 'Usuário ou senha incorretos.', 'error');
+      } catch (error) {
+        console.error(error);
+        let msg = 'Erro no login.';
+        if (error.code === 'auth/invalid-credential') msg = 'Email ou senha incorretos.';
+        if (error.code === 'auth/too-many-requests') msg = 'Muitas tentativas. Tente mais tarde.';
+        showMessage(loginMessage, msg, 'error');
       }
     });
 
     // === LOGOUT ===
-    btnLogout.addEventListener('click', () => {
-      sessionStorage.removeItem('adminLogged');
-      isAdmin = false;
-      updateAdminUI();
-      uploadForm.style.display = 'none';
-      loginForm.style.display = 'block';
-      showMessage(loginMessage, 'Você saiu do painel.', 'success');
+    btnLogout.addEventListener('click', async () => {
+      try {
+        await signOut(auth);
+        uploadForm.style.display = 'none';
+        loginForm.style.display = 'block';
+        showMessage(loginMessage, 'Você saiu do painel.', 'success');
+      } catch (error) {
+        console.error(error);
+      }
     });
 
     // === UPLOAD DE IMAGEM ===
     uploadForm.addEventListener('submit', async (e) => {
       e.preventDefault();
+      
       const file = document.getElementById('promoImage').files[0];
-      const title = document.getElementById('promoTitle').value.trim();
+      const title = document.getElementById('promoTitle').value.trim() || 'Nova Promoção';
       const desc = document.getElementById('promoDesc').value.trim();
 
       if (!file) {
@@ -358,53 +112,68 @@
         return;
       }
 
-      // Converter imagem para base64 (para localStorage)
+      // Validar tipo e tamanho
+      if (!file.type.startsWith('image/')) {
+        showMessage(uploadMessage, 'Apenas arquivos de imagem são permitidos.', 'error');
+        return;
+      }
+      if (file.size > 2 * 1024 * 1024) { // 2MB
+        showMessage(uploadMessage, 'Imagem muito grande. Máximo: 2MB.', 'error');
+        return;
+      }
+
       try {
-        const base64 = await fileToBase64(file);
+        showMessage(uploadMessage, 'Enviando imagem...', 'success');
         
-        // Validar tamanho (localStorage tem limite ~5MB total)
-        if (base64.length > 800000) {
-          showMessage(uploadMessage, 'Imagem muito grande. Use até ~600KB.', 'error');
-          return;
-        }
+        // Upload para Firebase Storage
+        const storageRef = ref(storage, `promocoes/${Date.now()}_${file.name}`);
+        const snapshot = await uploadBytes(storageRef, file);
+        const imageUrl = await getDownloadURL(snapshot.ref);
 
-        const newPromo = {
-          id: Date.now(),
-          image: base64,
-          title: title || 'Nova Promoção',
-          desc: desc,
-          date: new Date().toLocaleDateString('pt-BR')
-        };
+        // Salvar metadados no Firestore
+        await addDoc(collection(db, 'promocoes'), {
+          imageUrl,
+          title,
+          description: desc,
+          createdAt: new Date(),
+          active: true
+        });
 
-        // Salvar no localStorage
-        const promos = JSON.parse(localStorage.getItem('promocoes') || '[]');
-        promos.unshift(newPromo); // Adiciona no início
-        
-        // Manter limite máximo
-        if (promos.length > MAX_IMAGES) promos.pop();
-        
-        localStorage.setItem('promocoes', JSON.stringify(promos));
-        
-        showMessage(uploadMessage, 'Promoção publicada com sucesso! ✨', 'success');
+        showMessage(uploadMessage, 'Promoção publicada com sucesso! 🎉', 'success');
         uploadForm.reset();
-        loadGallery();
         
-      } catch (err) {
-        showMessage(uploadMessage, 'Erro ao processar imagem. Tente outra.', 'error');
-        console.error(err);
+      } catch (error) {
+        console.error('Erro no upload:', error);
+        showMessage(uploadMessage, 'Erro ao publicar. Tente novamente.', 'error');
       }
     });
 
-    // === UTILITÁRIOS ===
-    function fileToBase64(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
-    }
+    // === EXCLUIR PROMOÇÃO (Admin) ===
+    window.deletePromo = async (event, id) => {
+      event.stopPropagation();
+      if (!confirm('Tem certeza que deseja excluir esta promoção?')) return;
 
+      try {
+        // Excluir do Storage primeiro
+        const promoRef = doc(db, 'promocoes', id);
+        const promoSnap = await promoRef.get();
+        const imageUrl = promoSnap.data()?.imageUrl;
+        
+        if (imageUrl) {
+          const imageRef = ref(storage, imageUrl);
+          await deleteObject(imageRef).catch(() => {}); // Ignora se já foi deletado
+        }
+        
+        // Excluir do Firestore
+        await deleteDoc(promoRef);
+        showMessage(uploadMessage, 'Promoção excluída.', 'success');
+      } catch (error) {
+        console.error(error);
+        showMessage(uploadMessage, 'Erro ao excluir.', 'error');
+      }
+    };
+
+    // === UTILITÁRIOS ===
     function updateAdminUI() {
       if (isAdmin) {
         toggleAdmin.innerHTML = '<i class="fas fa-unlock"></i> Painel Admin (Ativo)';
@@ -425,6 +194,7 @@
     function showMessage(el, text, type) {
       el.textContent = text;
       el.className = `message ${type}`;
+      el.style.display = 'block';
       setTimeout(() => { el.style.display = 'none'; }, 4000);
     }
 
@@ -447,13 +217,15 @@
       }
     });
 
-    // Fechar modal com ESC
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && imageModal.classList.contains('active')) {
         imageModal.classList.remove('active');
         document.body.style.overflow = '';
       }
     });
+
+    // Limpar listener ao sair da página
+    window.addEventListener('beforeunload', () => {
+      if (unsubscribeGallery) unsubscribeGallery();
+    });
   </script>
-</body>
-</html>
