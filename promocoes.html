@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
   <style>
-    /* --- ESTILO VISUAL (Mantido) --- */
+    /* --- ESTILO VISUAL --- */
     :root{ --bgDark:#2d0f0f; --bgPrimary:#4a1c1c; --bgSecondary:#5c2020; --bgLight:#6b2525; --gold:#ffd700; --goldLight:#ffb347; --orange:#ff8c00; --red:#dc143c; --silver:#c0c0c0; --silverLight:#e8e8e8; --silverDark:#8a8a8a; }
     *{margin:0;padding:0;box-sizing:border-box;} html,body{min-height:100%;}
     body{ font-family:'Montserrat',sans-serif; min-height:100vh; display:grid; place-items:center; padding:24px; overflow:auto; color:#fff; background:radial-gradient(circle at 50% 30%, rgba(255,140,0,.15), transparent 40%), linear-gradient(180deg, var(--bgSecondary) 0%, var(--bgPrimary) 50%, var(--bgDark) 100%); background-attachment:fixed; }
@@ -22,9 +22,12 @@
     .gallery{ flex:1; width:100%; overflow-y:auto; padding:8px 4px; display:grid; grid-template-columns:repeat(2, 1fr); gap:12px; }
     .gallery::-webkit-scrollbar{width:4px;} .gallery::-webkit-scrollbar-thumb{background:var(--gold); border-radius:4px;}
     
-    .gallery-item{ aspect-ratio:1; border-radius:16px; overflow:hidden; position:relative; background:var(--bgPrimary); border:2px solid rgba(255,215,0,.3); cursor:pointer; transition:transform 0.3s; }
+    .gallery-item{ aspect-ratio:1; border-radius:16px; overflow:hidden; position:relative; background:var(--bgPrimary); border:2px solid rgba(255,215,0,.3); cursor:pointer; transition:transform 0.3s, opacity 0.3s; }
     .gallery-item:hover{ transform:scale(1.03); border-color:var(--gold); }
     .gallery-item img{ width:100%; height:100%; object-fit:cover; display:block; }
+    
+    /* Efeito de estar sendo deletado */
+    .gallery-item.deleting { opacity: 0.5; pointer-events: none; filter: grayscale(100%); }
     
     .btn-delete {
       position: absolute; top: 8px; right: 8px;
@@ -124,11 +127,11 @@
 
     async function fetchPromos() {
       try {
-        // Cache busting para garantir dados frescos
+        // Cache busting agressivo
         const response = await fetch(SCRIPT_URL + '?t=' + Date.now());
         const data = await response.json();
         
-        // Filtra apenas itens válidos (com imagem)
+        // Filtra apenas itens válidos
         promosData = (data || []).filter(item => item.image && String(item.image).startsWith('http'));
         
         renderGallery();
@@ -144,8 +147,8 @@
         return;
       }
 
-      gallery.innerHTML = promosData.map((item, index) => `
-        <div class="gallery-item ${isAdmin ? 'admin-mode' : ''}" onclick="openModal('${item.image}')">
+      gallery.innerHTML = promosData.map((item) => `
+        <div class="gallery-item ${isAdmin ? 'admin-mode' : ''}" id="item-${item.id}" onclick="openModal('${item.image}')">
           <img src="${item.image}" loading="lazy">
           <button class="btn-delete" onclick="deletePromo(event, '${item.id}')">
             <i class="fas fa-trash"></i>
@@ -176,7 +179,7 @@
 
         const imageUrl = imgData.data.url;
         const title = titleInput.value.trim() || 'Promoção';
-        const newId = Date.now().toString(); // Garante ID como string
+        const newId = Date.now().toString(); 
         
         await fetch(SCRIPT_URL, {
           method: 'POST',
@@ -200,31 +203,45 @@
       }
     }
 
+    // FUNÇÃO DE EXCLUSÃO CORRIGIDA
     async function deletePromo(event, id) {
       event.stopPropagation();
-      if(!confirm('Excluir esta promoção?')) return;
+      if(!confirm('Tem certeza que deseja excluir?')) return;
 
-      // Feedback visual imediato no botão
+      const itemElement = document.getElementById(`item-${id}`);
       const btn = event.currentTarget;
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-      
+
+      // 1. Feedback Visual Imediato (Simula exclusão)
+      if(itemElement) {
+        itemElement.classList.add('deleting');
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+      }
+
       try {
-        // Envia ID como string para garantir compatibilidade
+        // 2. Envia comando para o Google
         await fetch(SCRIPT_URL, {
           method: 'POST',
           mode: 'no-cors',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ action: 'delete', id: String(id) })
         });
-        
-        // Aguarda 1.5s para o Google processar e recarrega a lista
-        setTimeout(() => {
-           fetchPromos();
-        }, 1500);
+
+        // 3. Aguarda 2.5 segundos para o Google processar a escrita
+        await new Promise(r => setTimeout(r, 2500));
+
+        // 4. Remove o elemento da tela permanentemente
+        if(itemElement) itemElement.remove();
+
+        // 5. Recarrega os dados em segundo plano para garantir sincronia
+        fetchPromos();
         
       } catch (err) {
-        alert('Erro ao excluir.');
-        btn.innerHTML = '<i class="fas fa-trash"></i>';
+        console.error(err);
+        alert('Erro ao conectar com o servidor. Tente novamente.');
+        if(itemElement) {
+          itemElement.classList.remove('deleting');
+          btn.innerHTML = '<i class="fas fa-trash"></i>';
+        }
       }
     }
 
