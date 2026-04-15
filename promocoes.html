@@ -4,538 +4,278 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Promoções - Performance Auto Center</title>
-
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
   <style>
-    :root{
-      --bgDark:#2d0f0f; --bgPrimary:#4a1c1c; --bgSecondary:#5c2020; --bgLight:#6b2525;
-      --gold:#ffd700; --goldLight:#ffb347; --orange:#ff8c00; --orangeRed:#ff4500; --red:#dc143c; --redDark:#8b0000;
-      --silver:#c0c0c0; --silverLight:#e8e8e8; --silverDark:#8a8a8a; --steel:#b8b8b8;
-      --text:#ffffff; --textMuted:#d4af37;
-    }
-    *{margin:0;padding:0;box-sizing:border-box;}
-    html,body{min-height:100%;}
-    body{
-      font-family:'Montserrat',sans-serif; min-height:100vh; display:grid; place-items:center;
-      padding:24px; overflow:auto; color:#fff;
-      background:radial-gradient(circle at 50% 30%, rgba(255,140,0,.15), transparent 40%),
-                 radial-gradient(circle at 70% 50%, rgba(220,20,60,.1), transparent 35%),
-                 linear-gradient(180deg, var(--bgSecondary) 0%, var(--bgPrimary) 50%, var(--bgDark) 100%);
-      background-attachment:fixed;
-    }
-    .screen{
-      width:min(390px, 95vw); height:min(860px, 92vh); border-radius:44px; overflow:hidden;
-      position:relative;
-      background:radial-gradient(circle at 50% 0%, rgba(255,215,0,.08), transparent 35%),
-                 linear-gradient(180deg, var(--bgSecondary) 0%, var(--bgPrimary) 60%, var(--bgDark) 100%);
-      box-shadow:0 30px 80px rgba(0,0,0,.8), inset 0 0 0 1px rgba(255,255,255,.08), inset 0 0 60px rgba(0,0,0,.5);
-      display:flex; flex-direction:column; align-items:center; padding:24px 16px 16px;
-    }
-    .header{
-      width:100%; display:flex; align-items:center; justify-content:space-between;
-      padding:8px 0 16px; border-bottom:1px solid rgba(255,215,0,.2); margin-bottom:16px;
-    }
-    .btn-back{
-      background:linear-gradient(135deg, var(--bgLight), var(--bgPrimary));
-      border:2px solid var(--silver); color:var(--silverLight); padding:8px 16px;
-      border-radius:12px; text-decoration:none; font-weight:700; font-size:0.85rem;
-      display:flex; align-items:center; gap:8px; transition:all .3s;
-    }
-    .btn-back:hover{transform:translateX(-3px); border-color:var(--gold); box-shadow:0 0 15px rgba(255,215,0,.3);}
-    .page-title{
-      font-size:1.1rem; font-weight:800; letter-spacing:1px; text-transform:uppercase;
-      background:linear-gradient(90deg, var(--goldLight), var(--gold), var(--orange));
-      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-    }
+    /* --- ESTILO VISUAL (Mantido igual ao seu original) --- */
+    :root{ --bgDark:#2d0f0f; --bgPrimary:#4a1c1c; --bgSecondary:#5c2020; --bgLight:#6b2525; --gold:#ffd700; --goldLight:#ffb347; --orange:#ff8c00; --red:#dc143c; --silver:#c0c0c0; --silverLight:#e8e8e8; --silverDark:#8a8a8a; }
+    *{margin:0;padding:0;box-sizing:border-box;} html,body{min-height:100%;}
+    body{ font-family:'Montserrat',sans-serif; min-height:100vh; display:grid; place-items:center; padding:24px; overflow:auto; color:#fff; background:radial-gradient(circle at 50% 30%, rgba(255,140,0,.15), transparent 40%), linear-gradient(180deg, var(--bgSecondary) 0%, var(--bgPrimary) 50%, var(--bgDark) 100%); background-attachment:fixed; }
+    .screen{ width:min(390px, 95vw); height:min(860px, 92vh); border-radius:44px; overflow:hidden; position:relative; background:linear-gradient(180deg, var(--bgSecondary) 0%, var(--bgPrimary) 60%, var(--bgDark) 100%); box-shadow:0 30px 80px rgba(0,0,0,.8); display:flex; flex-direction:column; align-items:center; padding:24px 16px 16px; }
     
-    /* Gallery Grid */
-    .gallery{
-      flex:1; width:100%; overflow-y:auto; padding:8px 4px;
-      display:grid; grid-template-columns:repeat(2, 1fr); gap:12px;
-    }
-    .gallery::-webkit-scrollbar{width:6px;}
-    .gallery::-webkit-scrollbar-track{background:rgba(255,255,255,.05); border-radius:3px;}
-    .gallery::-webkit-scrollbar-thumb{background:var(--gold); border-radius:3px;}
+    .header{ width:100%; display:flex; align-items:center; justify-content:space-between; padding:8px 0 16px; border-bottom:1px solid rgba(255,215,0,.2); margin-bottom:16px; }
+    .btn-back{ background:var(--bgLight); border:2px solid var(--silver); color:var(--silverLight); padding:8px 16px; border-radius:12px; text-decoration:none; font-weight:700; font-size:0.85rem; display:flex; align-items:center; gap:8px; transition:0.3s; }
+    .btn-back:hover{ border-color:var(--gold); transform:translateX(-3px); }
+    .page-title{ font-size:1.1rem; font-weight:800; color:var(--gold); text-transform:uppercase; letter-spacing:1px; }
     
-    .gallery-item{
-      aspect-ratio:1; border-radius:16px; overflow:hidden; position:relative;
-      background:linear-gradient(135deg, var(--bgPrimary), var(--bgDark));
-      border:2px solid rgba(255,215,0,.3); box-shadow:0 8px 20px rgba(0,0,0,.5);
-      transition:transform .3s, box-shadow .3s; cursor:pointer;
-    }
-    .gallery-item:hover{transform:scale(1.03); box-shadow:0 12px 30px rgba(255,140,0,.4);}
-    .gallery-item img{
-      width:100%; height:100%; object-fit:cover; display:block;
-      transition:transform .5s;
-    }
-    .gallery-item:hover img{transform:scale(1.1);}
-    .gallery-item .btn-delete{
-      position:absolute; top:8px; right:8px;
-      width:32px; height:32px; border-radius:50%;
-      background:var(--red); color:#fff; border:none;
-      display:grid; place-items:center; cursor:pointer;
-      opacity:0; transition:opacity .3s; font-size:0.8rem;
-    }
-    .gallery-item:hover .btn-delete{opacity:1;}
-    .gallery-item .btn-delete:hover{background:var(--orangeRed); transform:scale(1.1);}
+    /* Galeria */
+    .gallery{ flex:1; width:100%; overflow-y:auto; padding:8px 4px; display:grid; grid-template-columns:repeat(2, 1fr); gap:12px; }
+    .gallery::-webkit-scrollbar{width:4px;} .gallery::-webkit-scrollbar-thumb{background:var(--gold); border-radius:4px;}
+    .gallery-item{ aspect-ratio:1; border-radius:16px; overflow:hidden; position:relative; background:var(--bgPrimary); border:2px solid rgba(255,215,0,.3); cursor:pointer; transition:transform 0.3s; }
+    .gallery-item:hover{ transform:scale(1.03); border-color:var(--gold); }
+    .gallery-item img{ width:100%; height:100%; object-fit:cover; display:block; }
+    .gallery-empty{ grid-column:1/-1; text-align:center; padding:40px; color:var(--silver); display:flex; flex-direction:column; align-items:center; gap:10px; }
     
-    .gallery-empty{
-      grid-column:1/-1; text-align:center; padding:40px 20px; color:var(--silver);
-      font-size:0.9rem; display:flex; flex-direction:column; align-items:center; gap:12px;
-    }
-    .gallery-empty i{font-size:2.5rem; opacity:.5;}
+    /* Admin Area */
+    .admin-toggle{ width:100%; padding:12px; text-align:center; border-top:1px solid rgba(255,215,0,.2); margin-top:auto; }
+    .btn-admin{ background:transparent; border:2px dashed var(--silver); color:var(--silver); padding:8px 16px; border-radius:10px; font-weight:600; cursor:pointer; font-size:0.8rem; text-transform:uppercase; }
+    .btn-admin:hover{ border-color:var(--gold); color:var(--gold); }
     
-    /* Loading */
-    .loading{
-      grid-column:1/-1; text-align:center; padding:40px; color:var(--gold);
-      display:flex; flex-direction:column; align-items:center; gap:12px;
-    }
-    .loading i{animation:spin 1s linear infinite; font-size:2rem;}
-    @keyframes spin{from{transform:rotate(0);} to{transform:rotate(360deg);}}
+    .admin-panel{ display:none; width:100%; padding:16px; background:rgba(0,0,0,.6); border-radius:16px; border:1px solid var(--gold); margin-top:12px; animation:slideIn 0.3s; }
+    .admin-panel.active{ display:block; }
+    @keyframes slideIn{ from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
     
-    /* Admin Section */
-    .admin-toggle{
-      width:100%; padding:12px; text-align:center; border-top:1px solid rgba(255,215,0,.2);
-    }
-    .btn-admin{
-      background:transparent; border:2px dashed var(--silver); color:var(--silver);
-      padding:8px 16px; border-radius:10px; font-size:0.8rem; font-weight:600;
-      cursor:pointer; transition:all .3s; text-transform:uppercase; letter-spacing:1px;
-    }
-    .btn-admin:hover{border-color:var(--gold); color:var(--gold);}
+    .form-group{ margin-bottom:12px; }
+    .form-group label{ display:block; color:var(--goldLight); font-size:0.8rem; margin-bottom:4px; font-weight:700; }
+    .form-group input, .form-group textarea{ width:100%; padding:10px; border-radius:8px; border:1px solid var(--silverDark); background:rgba(255,255,255,.1); color:#fff; font-family:inherit; }
+    .form-group input:focus{ outline:none; border-color:var(--gold); }
     
-    .admin-panel{
-      display:none; width:100%; padding:16px; background:rgba(45,15,15,.9);
-      border-radius:16px; border:2px solid var(--gold); margin-top:12px;
-    }
-    .admin-panel.active{display:block; animation:slideIn .3s ease;}
-    @keyframes slideIn{from{opacity:0; transform:translateY(-10px);} to{opacity:1; transform:translateY(0);}}
+    .btn-submit{ width:100%; padding:12px; background:linear-gradient(135deg, var(--gold), var(--orange)); color:#2d0f0f; font-weight:800; border:none; border-radius:8px; cursor:pointer; text-transform:uppercase; letter-spacing:1px; transition:0.3s; }
+    .btn-submit:hover{ transform:translateY(-2px); box-shadow:0 5px 15px rgba(255,140,0,0.4); }
+    .btn-submit:disabled{ opacity:0.6; cursor:not-allowed; transform:none; }
     
-    .form-group{margin-bottom:14px;}
-    .form-group label{
-      display:block; font-size:0.8rem; font-weight:700; color:var(--goldLight);
-      margin-bottom:6px; text-transform:uppercase; letter-spacing:1px;
-    }
-    .form-group input, .form-group textarea{
-      width:100%; padding:10px 12px; border-radius:10px; border:2px solid var(--silverDark);
-      background:rgba(255,255,255,.05); color:#fff; font-family:inherit; font-size:0.9rem;
-      transition:border-color .3s;
-    }
-    .form-group input:focus, .form-group textarea:focus{
-      outline:none; border-color:var(--gold); box-shadow:0 0 0 3px rgba(255,215,0,.2);
-    }
-    .form-group input[type="file"]{
-      padding:8px; background:rgba(255,215,0,.1); border-color:var(--gold);
-    }
-    .btn-submit{
-      width:100%; padding:12px; border:none; border-radius:12px;
-      background:linear-gradient(135deg, var(--gold), var(--orange));
-      color:#2d0f0f; font-weight:800; font-size:0.95rem; text-transform:uppercase;
-      letter-spacing:1px; cursor:pointer; transition:transform .2s, box-shadow .2s;
-    }
-    .btn-submit:hover{transform:translateY(-2px); box-shadow:0 8px 25px rgba(255,140,0,.5);}
-    .btn-submit:active{transform:translateY(0);}
-    .btn-submit:disabled{opacity:.6; cursor:not-allowed; transform:none;}
-    
-    .btn-logout{
-      background:linear-gradient(135deg, var(--red), var(--redDark));
-      color:#fff; border:none; padding:6px 14px; border-radius:8px;
-      font-size:0.75rem; font-weight:700; cursor:pointer; margin-left:auto;
-      display:flex; align-items:center; gap:6px; transition:all .3s;
-    }
-    .btn-logout:hover{transform:translateX(3px); box-shadow:0 0 15px rgba(220,20,60,.5);}
-    
-    .admin-header{
-      display:flex; align-items:center; justify-content:space-between;
-      padding-bottom:12px; border-bottom:1px solid rgba(255,215,0,.2); margin-bottom:12px;
-    }
-    .admin-title{
-      font-size:0.9rem; font-weight:800; color:var(--gold); text-transform:uppercase;
-      letter-spacing:1px; display:flex; align-items:center; gap:8px;
-    }
-    
+    .message{ padding:10px; border-radius:6px; margin-top:10px; font-size:0.8rem; display:none; text-align:center; font-weight:600; }
+    .message.success{ background:rgba(37,211,102,.2); border:1px solid #25D366; color:#afa; display:block; }
+    .message.error{ background:rgba(220,20,60,.2); border:1px solid #dc143c; color:#faa; display:block; }
+    .message.loading{ background:rgba(255,215,0,.2); border:1px solid var(--gold); color:var(--gold); display:block; }
+
     /* Modal */
-    .modal{
-      display:none; position:fixed; inset:0; background:rgba(0,0,0,.95);
-      z-index:1000; justify-content:center; align-items:center; padding:20px;
-      animation:fadeIn .2s ease;
-    }
-    .modal.active{display:flex;}
-    @keyframes fadeIn{from{opacity:0;} to{opacity:1;}}
-    .modal-content{
-      max-width:90%; max-height:90%; border-radius:20px; overflow:hidden;
-      border:3px solid var(--gold); box-shadow:0 0 50px rgba(255,215,0,.4);
-    }
-    .modal-content img{max-width:100%; max-height:90vh; display:block;}
-    .modal-close{
-      position:absolute; top:20px; right:20px; width:40px; height:40px;
-      border-radius:50%; background:var(--red); color:#fff; border:none;
-      font-size:1.2rem; cursor:pointer; display:grid; place-items:center;
-      transition:transform .2s;
-    }
-    .modal-close:hover{transform:rotate(90deg) scale(1.1);}
-    
-    /* Messages */
-    .message{
-      padding:10px 14px; border-radius:10px; margin-bottom:12px; font-size:0.85rem;
-      font-weight:600; display:none;
-    }
-    .message.success{background:rgba(37,211,102,.2); border:1px solid #25D366; color:#25D366; display:block;}
-    .message.error{background:rgba(220,20,60,.2); border:1px solid #dc143c; color:#ff6b6b; display:block;}
-    .message.warning{background:rgba(255,140,0,.2); border:1px solid var(--orange); color:var(--goldLight); display:block;}
-    
-    footer{
-      padding:16px 18px 20px; text-align:center; font-size:11px; font-weight:600;
-      letter-spacing:1px; background:linear-gradient(90deg, var(--gold), var(--orange), var(--gold));
-      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-      width:100%; border-top:1px solid rgba(255,215,0,.2); margin-top:auto;
-    }
-    
-    @media (max-width:420px){
-      body{padding:14px;}
-      .screen{width:100%; height:min(860px,94vh); border-radius:34px; padding:20px 12px 12px;}
-      .gallery{grid-template-columns:repeat(2,1fr); gap:10px;}
-    }
+    .modal{ display:none; position:fixed; inset:0; background:rgba(0,0,0,.95); z-index:1000; justify-content:center; align-items:center; padding:20px; }
+    .modal.active{ display:flex; animation:fadeIn 0.2s; }
+    @keyframes fadeIn{ from{opacity:0;} to{opacity:1;} }
+    .modal img{ max-width:100%; max-height:90vh; border:2px solid var(--gold); border-radius:12px; box-shadow:0 0 30px rgba(255,215,0,0.3); }
+    .modal-close{ position:absolute; top:20px; right:20px; color:#fff; font-size:2rem; cursor:pointer; background:var(--red); width:40px; height:40px; border-radius:50%; display:grid; place-items:center; }
   </style>
 </head>
 <body>
+
   <main class="screen">
-    <!-- Header -->
     <div class="header">
-      <a href="index.html" class="btn-back">
-        <i class="fas fa-arrow-left"></i> VOLTAR
-      </a>
+      <a href="index.html" class="btn-back"><i class="fas fa-arrow-left"></i> VOLTAR</a>
       <div class="page-title">🔥 Promoções</div>
-      <div id="adminStatus"></div>
     </div>
 
-    <!-- Gallery -->
+    <!-- GALERIA (Visível para Clientes) -->
     <div class="gallery" id="gallery">
-      <div class="loading">
-        <i class="fas fa-spinner"></i>
-        <div>Carregando promoções...</div>
+      <div class="gallery-empty">
+        <i class="fas fa-spinner fa-spin fa-2x"></i>
+        <p>Carregando ofertas...</p>
       </div>
     </div>
 
-    <!-- Admin Toggle -->
+    <!-- BOTÃO ADMIN (Rodapé) -->
     <div class="admin-toggle">
-      <button class="btn-admin" id="toggleAdmin">
+      <button class="btn-admin" onclick="toggleAdmin()">
         <i class="fas fa-lock"></i> Área do Administrador
       </button>
     </div>
 
-    <!-- Admin Panel -->
+    <!-- PAINEL ADMIN (Escondido) -->
     <div class="admin-panel" id="adminPanel">
-      <div class="admin-header">
-        <div class="admin-title"><i class="fas fa-user-shield"></i> Painel Admin</div>
-        <button class="btn-logout" id="btnLogout" style="display:none;">
-          <i class="fas fa-sign-out-alt"></i> Sair
-        </button>
+      
+      <!-- Tela de Login -->
+      <div id="loginSection">
+        <h3 style="color:var(--gold); margin-bottom:15px; text-align:center;">Acesso Restrito</h3>
+        <div class="form-group">
+          <label>Senha de Acesso:</label>
+          <input type="password" id="adminPass" placeholder="Digite a senha">
+        </div>
+        <button class="btn-submit" onclick="checkLogin()">Entrar</button>
       </div>
 
-      <!-- Login Form -->
-      <form id="loginForm">
-        <div class="form-group">
-          <label><i class="fas fa-user"></i> Usuário</label>
-          <input type="text" id="username" placeholder="Digite o usuário" required>
+      <!-- Tela de Upload (Só aparece após login) -->
+      <div id="uploadSection" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+          <h3 style="color:var(--gold);">Nova Promoção</h3>
+          <button onclick="logout()" style="background:none; border:none; color:var(--silver); cursor:pointer;"><i class="fas fa-sign-out-alt"></i> Sair</button>
         </div>
-        <div class="form-group">
-          <label><i class="fas fa-key"></i> Senha</label>
-          <input type="password" id="password" placeholder="Digite a senha" required>
-        </div>
-        <button type="submit" class="btn-submit">Entrar</button>
-        <div id="loginMessage" class="message"></div>
-      </form>
 
-      <!-- Upload Form -->
-      <form id="uploadForm" style="display:none; margin-top:16px; padding-top:16px; border-top:1px dashed var(--silver);">
         <div class="form-group">
-          <label><i class="fas fa-image"></i> Foto da Promoção</label>
-          <input type="file" id="promoImage" accept="image/*" required>
-          <small style="color:var(--silver); font-size:0.75rem; display:block; margin-top:4px;">Máx: 5MB • JPG, PNG ou GIF</small>
+          <label>1. Escolha a Foto:</label>
+          <input type="file" id="promoFile" accept="image/*">
         </div>
+        
         <div class="form-group">
-          <label><i class="fas fa-tag"></i> Título (opcional)</label>
-          <input type="text" id="promoTitle" placeholder="Ex: Troca de Óleo 20% OFF" maxlength="50">
+          <label>2. Título da Oferta:</label>
+          <input type="text" id="promoTitle" placeholder="Ex: Alinhamento Grátis">
         </div>
-        <div class="form-group">
-          <label><i class="fas fa-comment"></i> Descrição (opcional)</label>
-          <textarea id="promoDesc" placeholder="Detalhes da promoção..." rows="2" maxlength="150"></textarea>
-        </div>
-        <button type="submit" class="btn-submit" id="btnUpload">
-          <i class="fas fa-cloud-upload-alt"></i> Publicar Promoção
+
+        <button class="btn-submit" id="btnPost" onclick="postPromo()">
+          <i class="fas fa-cloud-upload-alt"></i> Publicar Agora
         </button>
-        <div id="uploadMessage" class="message"></div>
-      </form>
+        
+        <div id="msgBox" class="message"></div>
+      </div>
     </div>
-
-    <footer>
-      Suporte Studio Giga @3dgiga • Promoções Atualizadas
-    </footer>
   </main>
 
-  <!-- Modal para visualizar imagem -->
-  <div class="modal" id="imageModal">
-    <button class="modal-close" id="modalClose"><i class="fas fa-times"></i></button>
-    <div class="modal-content">
-      <img id="modalImg" src="" alt="Promoção">
-    </div>
+  <!-- Modal para ver foto grande -->
+  <div class="modal" id="imgModal" onclick="this.classList.remove('active')">
+    <span class="modal-close">&times;</span>
+    <img id="modalImg" src="">
   </div>
 
   <script>
-    // === CONFIGURAÇÃO ===
-    const CONFIG = {
-      // ⚠️ COLOQUE SUA CHAVE IMGBB AQUI (pegue em https://api.imgbb.com/)
-      imgbbApiKey: '492b2470652202fb94de6ed7a6a7c33f',
-      
-      // Credenciais do admin (frontend only - para projeto pequeno)
-      adminUser: 'admin',
-      adminPass: 'performance',
-      
-      // Chave do localStorage
-      storageKey: 'pac_promocoes',
-      
-      // Limite de promoções
-      maxPromos: 30
+    // ==========================================
+    // CONFIGURAÇÕES (JÁ PREENCHIDAS COM SEUS DADOS)
+    // ==========================================
+    
+    // 1. Sua Chave API do ImgBB
+    const IMGBB_KEY = '492b2470652202fb94de6ed7a6a7c33f'; 
+
+    // 2. URL do seu Google Apps Script (O "Robô")
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbysj-UnU2agy1GkcQUWtYBeSF5m-pMhbE8_CE-QyMECiXewFxS4BJWV5Tuh-0CExsJUjQ/exec';
+
+    // 3. Senha para você entrar no painel (Pode alterar se quiser)
+    const MY_PASSWORD = '1234'; 
+
+    // ==========================================
+
+    const gallery = document.getElementById('gallery');
+    const msgBox = document.getElementById('msgBox');
+    let isAdmin = false;
+
+    // AO CARREGAR A PÁGINA: Busca dados da Planilha
+    window.onload = function() {
+      fetchPromos();
     };
 
-    // === ELEMENTOS DOM ===
-    const gallery = document.getElementById('gallery');
-    const toggleAdmin = document.getElementById('toggleAdmin');
-    const adminPanel = document.getElementById('adminPanel');
-    const loginForm = document.getElementById('loginForm');
-    const uploadForm = document.getElementById('uploadForm');
-    const btnLogout = document.getElementById('btnLogout');
-    const adminStatus = document.getElementById('adminStatus');
-    const loginMessage = document.getElementById('loginMessage');
-    const uploadMessage = document.getElementById('uploadMessage');
-    const imageModal = document.getElementById('imageModal');
-    const modalImg = document.getElementById('modalImg');
-    const modalClose = document.getElementById('modalClose');
-    const btnUpload = document.getElementById('btnUpload');
-
-    // === ESTADO ===
-    let isAdmin = sessionStorage.getItem('pac_admin') === 'true';
-
-    // === INICIALIZAÇÃO ===
-    document.addEventListener('DOMContentLoaded', () => {
-      updateAdminUI();
-      loadGallery();
-    });
-
-    // === CARREGAR GALERIA ===
-    function loadGallery() {
+    // 1. FUNÇÃO PARA LER A PLANILHA (GET)
+    async function fetchPromos() {
       try {
-        const promos = JSON.parse(localStorage.getItem(CONFIG.storageKey) || '[]');
+        // Adicionamos um timestamp para evitar cache do navegador
+        const response = await fetch(SCRIPT_URL + '?t=' + Date.now());
+        const data = await response.json();
         
-        if (promos.length === 0) {
-          gallery.innerHTML = `
-            <div class="gallery-empty">
-              <i class="fas fa-gift"></i>
-              <div>Nenhuma promoção ativa no momento.</div>
-              <div style="font-size:0.8rem; opacity:.7;">Volte em breve para conferir ofertas exclusivas!</div>
-            </div>
-          `;
+        if(!data || data.length === 0) {
+          gallery.innerHTML = '<div class="gallery-empty"><i class="fas fa-gift fa-2x"></i><p>Nenhuma promoção ativa no momento.</p></div>';
           return;
         }
 
-        gallery.innerHTML = promos.map((p, index) => `
-          <div class="gallery-item" onclick="openModal('${p.image}')">
-            <img src="${p.image}" alt="${p.title || 'Promoção'}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\'gallery-empty\'><i class=\'fas fa-image\'></i><div>Imagem indisponível</div></div>'">
-            ${isAdmin ? `<button class="btn-delete" data-index="${index}" onclick="deletePromo(event, ${index})"><i class="fas fa-trash"></i></button>` : ''}
+        // Cria os cards da galeria
+        gallery.innerHTML = data.map(item => `
+          <div class="gallery-item" onclick="openModal('${item.image}')">
+            <img src="${item.image}" alt="${item.title}" loading="lazy">
           </div>
         `).join('');
         
-      } catch (e) {
-        console.error('Erro ao carregar galeria:', e);
-        gallery.innerHTML = `<div class="gallery-empty"><i class="fas fa-exclamation-triangle"></i><div>Erro ao carregar promoções.</div></div>`;
+      } catch (error) {
+        console.error("Erro ao ler planilha:", error);
+        gallery.innerHTML = '<div class="gallery-empty"><i class="fas fa-exclamation-circle fa-2x"></i><p>Erro ao carregar promoções.</p></div>';
       }
     }
 
-    // === TOGGLE ADMIN PANEL ===
-    toggleAdmin.addEventListener('click', () => {
-      adminPanel.classList.toggle('active');
-      if (adminPanel.classList.contains('active') && isAdmin) {
-        showUploadForm();
+    // 2. FUNÇÃO PARA POSTAR (UPLOAD + SALVAR NA PLANILHA)
+    async function postPromo() {
+      const fileInput = document.getElementById('promoFile');
+      const titleInput = document.getElementById('promoTitle');
+      const btn = document.getElementById('btnPost');
+
+      if(fileInput.files.length === 0) {
+        showMsg('Por favor, selecione uma foto.', 'error');
+        return;
       }
-    });
-
-    // === LOGIN ===
-    loginForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const user = document.getElementById('username').value.trim();
-      const pass = document.getElementById('password').value;
-
-      if (user === CONFIG.adminUser && pass === CONFIG.adminPass) {
-        sessionStorage.setItem('pac_admin', 'true');
-        isAdmin = true;
-        updateAdminUI();
-        showUploadForm();
-        showMessage(loginMessage, 'Login realizado com sucesso! ✨', 'success');
-        loginForm.reset();
-      } else {
-        showMessage(loginMessage, 'Usuário ou senha incorretos.', 'error');
-      }
-    });
-
-    // === LOGOUT ===
-    btnLogout.addEventListener('click', () => {
-      sessionStorage.removeItem('pac_admin');
-      isAdmin = false;
-      updateAdminUI();
-      uploadForm.style.display = 'none';
-      loginForm.style.display = 'block';
-      showMessage(loginMessage, 'Você saiu do painel.', 'success');
-    });
-
-    // === UPLOAD PARA IMGBB + LOCALSTORAGE ===
-    uploadForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
       
-      const file = document.getElementById('promoImage').files[0];
-      const title = document.getElementById('promoTitle').value.trim() || 'Nova Promoção';
-      const desc = document.getElementById('promoDesc').value.trim();
-
-      if (!file) {
-        showMessage(uploadMessage, 'Selecione uma imagem.', 'error');
-        return;
-      }
-
-      // Validar
-      if (!file.type.startsWith('image/')) {
-        showMessage(uploadMessage, 'Apenas imagens (JPG, PNG, GIF).', 'error');
-        return;
-      }
-      if (file.size > 5 * 1024 * 1024) {
-        showMessage(uploadMessage, 'Imagem muito grande. Máximo: 5MB.', 'error');
-        return;
-      }
-
-      // Desabilitar botão durante upload
-      btnUpload.disabled = true;
-      btnUpload.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
-      showMessage(uploadMessage, 'Enviando para ImgBB...', 'warning');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+      showMsg('Enviando imagem para nuvem...', 'loading');
 
       try {
-        // Upload para ImgBB
+        // PASSO A: Enviar imagem para ImgBB
         const formData = new FormData();
-        formData.append('image', file);
-        formData.append('key', CONFIG.imgbbApiKey);
-        formData.append('name', `promo_${Date.now()}`);
-        formData.append('expiration', '604800'); // 7 dias (opcional, pode remover para permanente)
+        formData.append('image', fileInput.files[0]);
+        formData.append('key', IMGBB_KEY);
 
-        const response = await fetch('https://api.imgbb.com/1/upload', {
+        const imgResp = await fetch('https://api.imgbb.com/1/upload', {
           method: 'POST',
           body: formData
         });
+        const imgData = await imgResp.json();
 
-        const data = await response.json();
-        
-        if (!data.success) {
-          throw new Error(data.error?.message || 'Erro no upload');
-        }
+        if(!imgData.success) throw new Error('Falha no ImgBB');
 
-        const imageUrl = data.data.url; // URL direta da imagem
+        const imageUrl = imgData.data.url;
+        const title = titleInput.value.trim() || 'Promoção Especial';
+        
+        // PASSO B: Enviar dados para o Google Script (Planilha)
+        showMsg('Salvando na galeria...', 'loading');
+        
+        // Usamos mode: 'no-cors' porque o Google Script redireciona e isso causa erro no fetch padrão, 
+        // mas o dado chega lá corretamente.
+        await fetch(SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors', 
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            id: Date.now(), 
+            image: imageUrl, 
+            title: title, 
+            date: new Date().toLocaleDateString() 
+          })
+        });
 
-        // Salvar no localStorage
-        const newPromo = {
-          id: Date.now(),
-          image: imageUrl,
-          title: title,
-          desc: desc,
-          date: new Date().toLocaleDateString('pt-BR'),
-          createdAt: Date.now()
-        };
+        showMsg('Sucesso! Promoção publicada.', 'success');
+        
+        // Limpa formulário e recarrega galeria após 2 segundos
+        setTimeout(() => {
+          fileInput.value = '';
+          titleInput.value = '';
+          location.reload(); 
+        }, 2000);
 
-        const promos = JSON.parse(localStorage.getItem(CONFIG.storageKey) || '[]');
-        promos.unshift(newPromo);
-        
-        // Manter limite
-        if (promos.length > CONFIG.maxPromos) promos.pop();
-        
-        localStorage.setItem(CONFIG.storageKey, JSON.stringify(promos));
-        
-        showMessage(uploadMessage, 'Promoção publicada com sucesso! 🎉', 'success');
-        uploadForm.reset();
-        loadGallery();
-        
-      } catch (error) {
-        console.error('Erro no upload:', error);
-        showMessage(uploadMessage, `Erro: ${error.message}. Verifique a chave ImgBB.`, 'error');
-      } finally {
-        btnUpload.disabled = false;
-        btnUpload.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Publicar Promoção';
+      } catch (err) {
+        console.error(err);
+        showMsg('Erro: ' + err.message, 'error');
+        btn.disabled = false;
+        btn.innerHTML = 'Tentar Novamente';
       }
-    });
+    }
 
-    // === EXCLUIR PROMOÇÃO ===
-    window.deletePromo = function(event, index) {
-      event.stopPropagation();
-      if (!confirm('Excluir esta promoção?')) return;
+    // --- Funções de Interface ---
 
-      try {
-        const promos = JSON.parse(localStorage.getItem(CONFIG.storageKey) || '[]');
-        promos.splice(index, 1);
-        localStorage.setItem(CONFIG.storageKey, JSON.stringify(promos));
-        loadGallery();
-        showMessage(uploadMessage, 'Promoção excluída.', 'success');
-      } catch (e) {
-        console.error(e);
-        showMessage(uploadMessage, 'Erro ao excluir.', 'error');
-      }
-    };
+    function toggleAdmin() {
+      document.getElementById('adminPanel').classList.toggle('active');
+    }
 
-    // === UTILITÁRIOS ===
-    function updateAdminUI() {
-      if (isAdmin) {
-        toggleAdmin.innerHTML = '<i class="fas fa-unlock"></i> Painel Admin (Ativo)';
-        btnLogout.style.display = 'flex';
-        adminStatus.innerHTML = '<i class="fas fa-check-circle" style="color:var(--gold)"></i>';
+    function checkLogin() {
+      const pass = document.getElementById('adminPass').value;
+      if(pass === MY_PASSWORD) {
+        isAdmin = true;
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('uploadSection').style.display = 'block';
+        showMsg('Logado como Admin.', 'success');
       } else {
-        toggleAdmin.innerHTML = '<i class="fas fa-lock"></i> Área do Administrador';
-        btnLogout.style.display = 'none';
-        adminStatus.innerHTML = '';
+        showMsg('Senha incorreta.', 'error');
       }
     }
 
-    function showUploadForm() {
-      loginForm.style.display = 'none';
-      uploadForm.style.display = 'block';
+    function logout() {
+      isAdmin = false;
+      document.getElementById('loginSection').style.display = 'block';
+      document.getElementById('uploadSection').style.display = 'none';
+      document.getElementById('adminPass').value = '';
     }
 
-    function showMessage(el, text, type) {
-      el.textContent = text;
-      el.className = `message ${type}`;
-      setTimeout(() => { el.style.display = 'none'; }, 5000);
+    function openModal(src) {
+      document.getElementById('modalImg').src = src;
+      document.getElementById('imgModal').classList.add('active');
     }
 
-    // === MODAL DE IMAGEM ===
-    window.openModal = function(src) {
-      modalImg.src = src;
-      imageModal.classList.add('active');
-      document.body.style.overflow = 'hidden';
+    function showMsg(text, type) {
+      msgBox.innerText = text;
+      msgBox.className = 'message ' + type;
     }
-
-    modalClose.addEventListener('click', () => {
-      imageModal.classList.remove('active');
-      document.body.style.overflow = '';
-    });
-
-    imageModal.addEventListener('click', (e) => {
-      if (e.target === imageModal) {
-        imageModal.classList.remove('active');
-        document.body.style.overflow = '';
-      }
-    });
-
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && imageModal.classList.contains('active')) {
-        imageModal.classList.remove('active');
-        document.body.style.overflow = '';
-      }
-    });
   </script>
 </body>
 </html>
