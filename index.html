@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
   <title>Performance Auto Center</title>
 
@@ -27,6 +27,7 @@
       --silverLight:#e8e8e8;
       --silverDark:#8a8a8a;
       --steel:#b8b8b8;
+      --steelDark:#7a7a7a;
 
       --text:#ffffff;
       --textMuted:#d4af37;
@@ -44,10 +45,11 @@
 
     body{
       font-family:'Montserrat',sans-serif;
-      min-height:100vh;
-      display:grid;
-      place-items:center;
-      padding:24px;
+      min-height:100dvh;
+      display:flex;
+      justify-content:center;
+      align-items:flex-start;
+      padding:16px;
       overflow:auto;
       color:#fff;
       background:
@@ -55,13 +57,16 @@
         radial-gradient(circle at 70% 50%, rgba(220,20,60,.1), transparent 35%),
         linear-gradient(180deg, var(--bgSecondary) 0%, var(--bgPrimary) 50%, var(--bgDark) 100%);
       background-attachment:fixed;
+      -webkit-overflow-scrolling:touch;
     }
 
     .screen{
-      width:min(390px, 95vw);
-      height:min(860px, 92vh);
+      width:min(390px, 100%);
+      min-height:calc(100dvh - 32px);
+      max-height:calc(100dvh - 32px);
       border-radius:44px;
-      overflow:hidden;
+      overflow-y:auto;
+      overflow-x:hidden;
       position:relative;
       background:
         radial-gradient(circle at 50% 0%, rgba(255,215,0,.08), transparent 35%),
@@ -73,7 +78,11 @@
       display:flex;
       flex-direction:column;
       align-items:center;
-      padding:32px 20px 20px;
+      padding:32px 20px calc(20px + env(safe-area-inset-bottom));
+      -webkit-overflow-scrolling:touch;
+      overscroll-behavior:contain;
+      scrollbar-width:thin;
+      touch-action:pan-y;
     }
 
     .screen::before{
@@ -108,6 +117,7 @@
       position:relative;
       z-index:1;
       margin-bottom:24px;
+      flex-shrink:0;
     }
 
     .logo-container{
@@ -120,7 +130,7 @@
       width:100%;
       height:auto;
       display:block;
-      filter: 
+      filter:
         drop-shadow(0 8px 20px rgba(0,0,0,.8))
         drop-shadow(0 0 30px rgba(255,140,0,.2));
       border-radius:16px;
@@ -162,7 +172,18 @@
       gap:14px;
       position:relative;
       z-index:1;
-      flex:1;
+      flex:0 0 auto;
+    }
+
+    .action-wrapper{
+      border-radius:18px;
+      padding:2px;
+      background:linear-gradient(180deg, #ffffff 0%, #c0c0c0 25%, #8a8a8a 50%, #b8b8b8 75%, #ffffff 100%);
+      transition:all .3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    .action-wrapper:hover{
+      background:linear-gradient(180deg, #ffffff 0%, var(--goldLight) 25%, var(--silver) 50%, var(--goldLight) 75%, #ffffff 100%);
     }
 
     .action{
@@ -181,8 +202,7 @@
       border-radius:16px;
       background:
         linear-gradient(180deg, rgba(91,28,28,.95) 0%, rgba(74,28,28,.98) 100%);
-      border:2px solid transparent;
-      border-image:linear-gradient(180deg, var(--silver), var(--steelDark)) 1;
+      border:none;
       box-shadow:
         0 8px 24px rgba(0,0,0,.6),
         inset 0 1px 0 rgba(255,255,255,.2),
@@ -190,10 +210,11 @@
       transition:all .3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
       position:relative;
       overflow:hidden;
+      flex-shrink:0;
     }
 
     .action::before{
-      content:''; 
+      content:'';
       position:absolute;
       inset:0;
       background:linear-gradient(180deg, rgba(255,215,0,.1) 0%, transparent 50%);
@@ -216,17 +237,22 @@
       left:100%;
     }
 
-    .action:hover{
-      transform:translateY(-3px) scale(1.02);
+    .action-wrapper:hover .action{
       box-shadow:
         0 12px 32px rgba(0,0,0,.7),
         inset 0 1px 0 rgba(255,255,255,.3),
         0 0 25px rgba(255,140,0,.3);
-      border-image:linear-gradient(180deg, var(--goldLight), var(--silver)) 1;
     }
 
-    .action:active{
+    .action-wrapper:hover{
+      transform:translateY(-3px) scale(1.02);
+    }
+
+    .action-wrapper:active{
       transform:translateY(-1px) scale(0.98);
+    }
+
+    .action-wrapper:active .action{
       box-shadow:
         0 4px 16px rgba(0,0,0,.6),
         inset 0 2px 4px rgba(0,0,0,.5);
@@ -267,9 +293,8 @@
       background:linear-gradient(135deg, var(--red) 0%, var(--redDark) 100%);
     }
 
-    .icon.promo{
-      background:linear-gradient(135deg, var(--gold) 0%, var(--orange) 100%);
-      color:#4a1c1c;
+    .icon.google-review{
+      background:linear-gradient(135deg, #4285F4 0%, #34A853 50%, #FBBC05 75%, #EA4335 100%);
     }
 
     .label{
@@ -294,8 +319,8 @@
     }
 
     footer{
-      margin-top:auto;
-      padding:20px 18px 24px;
+      margin-top:20px;
+      padding:20px 18px calc(24px + env(safe-area-inset-bottom));
       position:relative;
       z-index:1;
       text-align:center;
@@ -309,18 +334,21 @@
       width:100%;
       border-top:1px solid rgba(255,215,0,.2);
       text-shadow:0 0 20px rgba(255,215,0,.1);
+      flex-shrink:0;
     }
 
     @media (max-width: 420px){
       body{
-        padding:14px;
+        padding:10px;
+        background-attachment:scroll;
       }
 
       .screen{
         width:100%;
-        height:min(860px, 94vh);
-        border-radius:34px;
-        padding:28px 16px 16px;
+        min-height:calc(100dvh - 20px);
+        max-height:calc(100dvh - 20px);
+        border-radius:30px;
+        padding:24px 14px calc(18px + env(safe-area-inset-bottom));
       }
 
       .action{
@@ -333,6 +361,18 @@
         height:46px;
         flex-basis:46px;
         font-size:22px;
+      }
+
+      .label{
+        font-size:0.82rem;
+      }
+
+      .logo-text{
+        letter-spacing:2px;
+      }
+
+      .tagline{
+        letter-spacing:1.2px;
       }
     }
   </style>
@@ -354,46 +394,55 @@
     </div>
 
     <div class="actions">
-      <a class="action" href="https://wa.me/5527999999999?text=Ol%C3%A1%2C%20quero%20agendar%20um%20servi%C3%A7o." target="_blank" rel="noopener noreferrer">
-        <div class="icon whatsapp"><i class="fab fa-whatsapp"></i></div>
-        <div class="label">
-          <span>AGENDE SEU SERVIÇO</span>
-          <span class="label-small">AGORA</span>
-        </div>
-      </a>
+      <div class="action-wrapper">
+        <a class="action" href="https://wa.me/5527999999999?text=Ol%C3%A1%2C%20quero%20agendar%20um%20servi%C3%A7o." target="_blank" rel="noopener noreferrer">
+          <div class="icon whatsapp"><i class="fab fa-whatsapp"></i></div>
+          <div class="label">
+            <span>AGENDE SEU SERVIÇO</span>
+            <span class="label-small">AGORA</span>
+          </div>
+        </a>
+      </div>
 
-      <a class="action" href="https://instagram.com/performance_auto" target="_blank" rel="noopener noreferrer">
-        <div class="icon instagram"><i class="fab fa-instagram"></i></div>
-        <div class="label">
-          <span>NOVIDADES E PROJETOS</span>
-          <span class="label-small">@PERFORMANCE_AUTO</span>
-        </div>
-      </a>
+      <div class="action-wrapper">
+        <a class="action" href="https://instagram.com/performance_auto" target="_blank" rel="noopener noreferrer">
+          <div class="icon instagram"><i class="fab fa-instagram"></i></div>
+          <div class="label">
+            <span>NOVIDADES E PROJETOS</span>
+            <span class="label-small">@PERFORMANCE_AUTO</span>
+          </div>
+        </a>
+      </div>
 
-      <a class="action" href="https://maps.google.com" target="_blank" rel="noopener noreferrer">
-        <div class="icon location"><i class="fas fa-map-marker-alt"></i></div>
-        <div class="label">
-          <span>COMO CHEGAR</span>
-          <span class="label-small">(NOSSA LOCALIZAÇÃO)</span>
-        </div>
-      </a>
+      <div class="action-wrapper">
+        <a class="action" href="https://maps.google.com" target="_blank" rel="noopener noreferrer">
+          <div class="icon location"><i class="fas fa-map-marker-alt"></i></div>
+          <div class="label">
+            <span>COMO CHEGAR</span>
+            <span class="label-small">(NOSSA LOCALIZAÇÃO)</span>
+          </div>
+        </a>
+      </div>
 
-      <a class="action" href="tel:+5527999999999">
-        <div class="icon phone"><i class="fas fa-phone-alt"></i></div>
-        <div class="label">
-          <span>LIGUE PARA NÓS</span>
-          <span class="label-small">(FALE CONOSCO)</span>
-        </div>
-      </a>
-<!-- Botão de Promoções - substitua o existente por este -->
-<a class="action" href="promocoes.html">
-  <div class="icon promo"><i class="fas fa-percentage"></i></div>
-  <div class="label">
-    <span>PROMOÇÕES E</span>
-    <span class="label-small">OFERTAS ESPECIAIS</span>
-  </div>
-</a>
+      <div class="action-wrapper">
+        <a class="action" href="https://search.google.com/local/writereview?placeid=SEU_PLACE_ID_AQUI" target="_blank" rel="noopener noreferrer">
+          <div class="icon google-review"><i class="fab fa-google"></i></div>
+          <div class="label">
+            <span>AVALIE NO GOOGLE</span>
+            <span class="label-small">DEIXE SUA OPINIÃO</span>
+          </div>
+        </a>
+      </div>
 
+      <div class="action-wrapper">
+        <a class="action" href="tel:+5527999999999">
+          <div class="icon phone"><i class="fas fa-phone-alt"></i></div>
+          <div class="label">
+            <span>LIGUE PARA NÓS</span>
+            <span class="label-small">(FALE CONOSCO)</span>
+          </div>
+        </a>
+      </div>
     </div>
 
     <footer>
